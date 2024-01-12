@@ -9,9 +9,8 @@ import (
 func InitRoutes(router *gin.Engine) {
 	api := router.Group("/api")
 	{
-		api.GET("/", controllers.Home)
 		// users
-		api.GET("/users") // user list
+		api.GET("/users", controllers.Users) // user list
 		api.POST("/login", controllers.Login)
 		api.POST("/register", controllers.Register)
 		// projects

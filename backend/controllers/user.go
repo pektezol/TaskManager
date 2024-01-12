@@ -13,6 +13,38 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func Users(c *gin.Context) {
+	type User struct {
+		ID       int    `json:"id"`
+		Username string `json:"username"`
+		Email    string `json:"email"`
+	}
+	type UsersRespnse struct {
+		Users []User `json:"users"`
+	}
+	var users []User
+	sql := `SELECT u.id, u.username, u.email FROM users u;`
+	rows, err := database.DB.Query(sql)
+	if err != nil {
+		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+		return
+	}
+	for rows.Next() {
+		var user User
+		err = rows.Scan(&user.ID, &user.Username, &user.Email)
+		if err != nil {
+			c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+			return
+		}
+		users = append(users, user)
+	}
+	c.JSON(http.StatusOK, utils.OkayResponse(
+		UsersRespnse{
+			Users: users,
+		},
+	))
+}
+
 func Register(c *gin.Context) {
 	type RegisterRequest struct {
 		Username string `json:"username" binding:"required"`
