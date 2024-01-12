@@ -16,17 +16,10 @@ func ListProjects(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse("User not logged in."))
 		return
 	}
-	type Project struct {
-		ID            int          `json:"id"`
-		Name          string       `json:"username"`
-		Owner         utils.User   `json:"owner"`
-		Collaborators []utils.User `json:"collaborators"`
-		CreatedAt     time.Time    `json:"created_at"`
-	}
 	type ProjectsResponse struct {
-		Projects []Project `json:"projects"`
+		Projects []utils.Project `json:"projects"`
 	}
-	projects := []Project{}
+	projects := []utils.Project{}
 	sql := `SELECT p.id, p.name, p.created_at, u.id, u.username, u.email FROM projects p JOIN users u ON p.owner_id = u.id WHERE p.active = true;`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
@@ -34,7 +27,7 @@ func ListProjects(c *gin.Context) {
 		return
 	}
 	for rows.Next() {
-		var p Project
+		var p utils.Project
 		p.Collaborators = []utils.User{}
 		err = rows.Scan(&p.ID, &p.Name, &p.CreatedAt, &p.Owner.ID, &p.Owner.Username, &p.Owner.Email)
 		if err != nil {

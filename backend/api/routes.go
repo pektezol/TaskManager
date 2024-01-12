@@ -21,14 +21,14 @@ func InitRoutes(router *gin.Engine) {
 		api.POST("/projects/:projectid/collaborator", CheckAuth, controllers.AddCollaborator)              // project add collaborator
 		api.DELETE("/projects/:projectid/collaborator/:userid", CheckAuth, controllers.RemoveCollaborator) // project remove collaborator
 		// tasks
-		api.GET("/projects/:projectid/tasks")                             // task list
-		api.GET("/projects/:projectid/tasks/:taskid")                     // task get
-		api.POST("/projects/:projectid/tasks")                            // task create
-		api.PUT("/projects/:projectid/tasks/:taskid")                     // task update
-		api.DELETE("/projects/:projectid/tasks/:taskid")                  // task delete
-		api.POST("/projects/:projectid/tasks/:taskid/comment")            // task add comment
-		api.POST("/projects/:projectid/tasks/:taskid/assignee")           // task add assignee
-		api.DELETE("/projects/:projectid/tasks/:taskid/assignee/:userid") // task remove assignee
+		api.GET("/projects/:projectid/tasks", CheckAuth, controllers.ListTasks)       // task list
+		api.GET("/projects/:projectid/tasks/:taskid", CheckAuth, controllers.GetTask) // task get
+		api.POST("/projects/:projectid/tasks", CheckAuth, controllers.CreateTask)     // task create
+		api.PUT("/projects/:projectid/tasks/:taskid")                                 // task update
+		api.DELETE("/projects/:projectid/tasks/:taskid")                              // task delete
+		api.POST("/projects/:projectid/tasks/:taskid/comment")                        // task add comment
+		api.POST("/projects/:projectid/tasks/:taskid/assignee")                       // task add assignee
+		api.DELETE("/projects/:projectid/tasks/:taskid/assignee/:userid")             // task remove assignee
 		// priority
 		api.GET("/priority") // priority list
 		// status
