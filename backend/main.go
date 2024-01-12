@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"taskmanager/api"
 	"taskmanager/database"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,6 @@ func main() {
 	}
 	router := gin.Default()
 	database.ConnectDB()
-	// api.InitRoutes(router)
+	api.InitRoutes(router)
 	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
