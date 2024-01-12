@@ -14,7 +14,7 @@ func InitRoutes(router *gin.Engine) {
 		api.POST("/login", controllers.Login)
 		api.POST("/register", controllers.Register)
 		// projects
-		api.GET("/projects")                                    // project listd
+		api.GET("/projects")                                    // project list
 		api.GET("/projects/:projectid")                         // project get
 		api.POST("/projects")                                   // project create
 		api.DELETE("/projects/:projectid")                      // project delete

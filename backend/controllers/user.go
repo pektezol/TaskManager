@@ -19,7 +19,7 @@ func Users(c *gin.Context) {
 		Username string `json:"username"`
 		Email    string `json:"email"`
 	}
-	type UsersRespnse struct {
+	type UsersResponse struct {
 		Users []User `json:"users"`
 	}
 	var users []User
@@ -39,7 +39,7 @@ func Users(c *gin.Context) {
 		users = append(users, user)
 	}
 	c.JSON(http.StatusOK, utils.OkayResponse(
-		UsersRespnse{
+		UsersResponse{
 			Users: users,
 		},
 	))
