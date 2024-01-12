@@ -1,12 +1,12 @@
-DROP TABLE IF EXISTS "users";
-DROP TABLE IF EXISTS "projects";
-DROP TABLE IF EXISTS "project_collaborators";
-DROP TABLE IF EXISTS "status";
-DROP TABLE IF EXISTS "priority";
-DROP TABLE IF EXISTS "notifications";
-DROP TABLE IF EXISTS "tasks";
-DROP TABLE IF EXISTS "task_assignees";
-DROP TABLE IF EXISTS "task_comments";
+DROP TABLE IF EXISTS "users" CASCADE;
+DROP TABLE IF EXISTS "projects" CASCADE;
+DROP TABLE IF EXISTS "project_collaborators" CASCADE;
+DROP TABLE IF EXISTS "status" CASCADE;
+DROP TABLE IF EXISTS "priority" CASCADE;
+DROP TABLE IF EXISTS "notifications" CASCADE;
+DROP TABLE IF EXISTS "tasks" CASCADE;
+DROP TABLE IF EXISTS "task_assignees" CASCADE;
+DROP TABLE IF EXISTS "task_comments" CASCADE;
 
 CREATE TABLE "users" (
     id SERIAL PRIMARY KEY,
@@ -60,6 +60,7 @@ CREATE TABLE "tasks" (
     priority INT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     deadline TIMESTAMP,
+    active BOOLEAN NOT NULL DEFAULT true,
     FOREIGN KEY (project_id) REFERENCES projects(id),
     FOREIGN KEY (owner_id) REFERENCES users(id),
     FOREIGN KEY (status) REFERENCES status(id),
