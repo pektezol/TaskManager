@@ -10,16 +10,16 @@ func InitRoutes(router *gin.Engine) {
 	api := router.Group("/api")
 	{
 		// users
-		api.GET("/users", controllers.Users) // user list
+		api.GET("/users", CheckAuth, controllers.Users) // user list
 		api.POST("/login", controllers.Login)
 		api.POST("/register", controllers.Register)
 		// projects
-		api.GET("/projects")                                    // project list
-		api.GET("/projects/:projectid")                         // project get
-		api.POST("/projects")                                   // project create
-		api.DELETE("/projects/:projectid")                      // project delete
-		api.POST("/projects/:projectid/collaborator")           // project add collaborator
-		api.DELETE("/projects/:projectid/collaborator/:userid") // project remove collaborator
+		api.GET("/projects", CheckAuth, controllers.ListProjects)                                          // project list
+		api.GET("/projects/:projectid", CheckAuth, controllers.GetProject)                                 // project get
+		api.POST("/projects", CheckAuth, controllers.CreateProject)                                        // project create
+		api.DELETE("/projects/:projectid", CheckAuth, controllers.DeleteProject)                           // project delete
+		api.POST("/projects/:projectid/collaborator", CheckAuth, controllers.AddCollaborator)              // project add collaborator
+		api.DELETE("/projects/:projectid/collaborator/:userid", CheckAuth, controllers.RemoveCollaborator) // project remove collaborator
 		// tasks
 		api.GET("/projects/:projectid/tasks")                             // task list
 		api.GET("/projects/:projectid/tasks/:taskid")                     // task get

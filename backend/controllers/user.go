@@ -14,15 +14,10 @@ import (
 )
 
 func Users(c *gin.Context) {
-	type User struct {
-		ID       int    `json:"id"`
-		Username string `json:"username"`
-		Email    string `json:"email"`
-	}
 	type UsersResponse struct {
-		Users []User `json:"users"`
+		Users []utils.User `json:"users"`
 	}
-	var users []User
+	var users []utils.User
 	sql := `SELECT u.id, u.username, u.email FROM users u;`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
@@ -30,7 +25,7 @@ func Users(c *gin.Context) {
 		return
 	}
 	for rows.Next() {
-		var user User
+		var user utils.User
 		err = rows.Scan(&user.ID, &user.Username, &user.Email)
 		if err != nil {
 			c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
@@ -115,7 +110,7 @@ func createTokenJWT(email string) (string, error) {
 		ExpiresAt: jwt.NewNumericDate(exp),
 		Subject:   email,
 	}
-	signed, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	signed, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
 		return "", err
 	}
