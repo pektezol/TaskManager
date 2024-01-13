@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"taskmanager/database"
@@ -139,9 +140,10 @@ func DeleteProject(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
+	var projectName string
 	var projectOwnerID int
-	sql := `SELECT p.owner_id FROM projects p WHERE p.id = $1`
-	database.DB.QueryRow(sql, projectID).Scan(&projectOwnerID)
+	sql := `SELECT p.name, p.owner_id FROM projects p WHERE p.id = $1`
+	database.DB.QueryRow(sql, projectID).Scan(&projectName, &projectOwnerID)
 	if projectOwnerID != ownerID.(int) {
 		c.JSON(http.StatusOK, utils.ErrorResponse("You are not the owner of this project."))
 		return
@@ -183,9 +185,10 @@ func AddCollaborator(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse("The given user does not exist."))
 		return
 	}
+	var projectName string
 	var projectOwnerID int
-	sql = `SELECT p.owner_id FROM projects p WHERE p.id = $1`
-	database.DB.QueryRow(sql, projectID).Scan(&projectOwnerID)
+	sql = `SELECT p.name, p.owner_id FROM projects p WHERE p.id = $1`
+	database.DB.QueryRow(sql, projectID).Scan(&projectName, &projectOwnerID)
 	if projectOwnerID != ownerID.(int) {
 		c.JSON(http.StatusOK, utils.ErrorResponse("You are not the owner of this project."))
 		return
@@ -196,6 +199,7 @@ func AddCollaborator(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
+	CreateNotification(userID, fmt.Sprintf("You are added to the project: \"%s\" as a new collaborator!", projectName))
 	c.JSON(http.StatusOK, utils.OkayResponse(req))
 }
 
@@ -224,9 +228,10 @@ func RemoveCollaborator(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse("The given user does not exist."))
 		return
 	}
+	var projectName string
 	var projectOwnerID int
-	sql = `SELECT p.owner_id FROM projects p WHERE p.id = $1`
-	database.DB.QueryRow(sql, projectID).Scan(&projectOwnerID)
+	sql = `SELECT p.name, p.owner_id FROM projects p WHERE p.id = $1`
+	database.DB.QueryRow(sql, projectID).Scan(&projectName, &projectOwnerID)
 	if projectOwnerID != ownerID.(int) {
 		c.JSON(http.StatusOK, utils.ErrorResponse("You are not the owner of this project."))
 		return
@@ -237,5 +242,6 @@ func RemoveCollaborator(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
+	CreateNotification(userID, fmt.Sprintf("You are removed from the project: \"%s\" as a collaborator.", projectName))
 	c.JSON(http.StatusOK, utils.OkayResponse(nil))
 }

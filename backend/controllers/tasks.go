@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"taskmanager/database"
@@ -268,6 +269,29 @@ func UpdateTask(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
+	sql = `SELECT a.id FROM task_assignees a WHERE a.task_id = $1`
+	rows, err := database.DB.Query(sql, taskID)
+	if err != nil {
+		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+		return
+	}
+	for rows.Next() {
+		var aID int
+		err = rows.Scan(&aID)
+		if err != nil {
+			c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+			return
+		}
+		CreateNotification(aID, fmt.Sprintf("The task #%d that you are assigned to has been updated.", taskID))
+	}
+	sql = `SELECT t.owner_id FROM tasks WHERE t.id = $1`
+	var oID int
+	err = database.DB.QueryRow(sql, taskID).Scan(&oID)
+	if err != nil {
+		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+		return
+	}
+	CreateNotification(oID, fmt.Sprintf("The task #%d that you are the owner to has been updated.", taskID))
 	c.JSON(http.StatusOK, utils.OkayResponse(req))
 }
 
@@ -303,6 +327,29 @@ func DeleteTask(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
+	sql = `SELECT a.id FROM task_assignees a WHERE a.task_id = $1`
+	rows, err := database.DB.Query(sql, taskID)
+	if err != nil {
+		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+		return
+	}
+	for rows.Next() {
+		var aID int
+		err = rows.Scan(&aID)
+		if err != nil {
+			c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+			return
+		}
+		CreateNotification(aID, fmt.Sprintf("The task #%d that you are assigned to has been deleted.", taskID))
+	}
+	sql = `SELECT t.owner_id FROM tasks WHERE t.id = $1`
+	var oID int
+	err = database.DB.QueryRow(sql, taskID).Scan(&oID)
+	if err != nil {
+		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+		return
+	}
+	CreateNotification(oID, fmt.Sprintf("The task #%d that you are the owner to has been deleted.", taskID))
 	c.JSON(http.StatusOK, utils.OkayResponse(nil))
 }
 
@@ -347,6 +394,29 @@ func CreateComment(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
+	sql = `SELECT a.id FROM task_assignees a WHERE a.task_id = $1`
+	rows, err := database.DB.Query(sql, taskID)
+	if err != nil {
+		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+		return
+	}
+	for rows.Next() {
+		var aID int
+		err = rows.Scan(&aID)
+		if err != nil {
+			c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+			return
+		}
+		CreateNotification(aID, fmt.Sprintf("A new comment has been added to task #%d that you are assigned to.", taskID))
+	}
+	sql = `SELECT t.owner_id FROM tasks WHERE t.id = $1`
+	var oID int
+	err = database.DB.QueryRow(sql, taskID).Scan(&oID)
+	if err != nil {
+		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+		return
+	}
+	CreateNotification(oID, fmt.Sprintf("A new comment has been added to task #%d that you are the owner to.", taskID))
 	c.JSON(http.StatusOK, utils.OkayResponse(req))
 }
 
@@ -385,12 +455,20 @@ func AddAssignee(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
-	sql := `INSERT INTO task_assignees (task_id,user_id) VALUES ($1,$2);`
-	_, err = database.DB.Exec(sql, taskID, req.UserID)
+	var assigneeID int
+	sql := `SELECT u.id FROM users u WHERE u.id = $1`
+	database.DB.QueryRow(sql, req.UserID).Scan(&assigneeID)
+	if assigneeID != req.UserID {
+		c.JSON(http.StatusOK, utils.ErrorResponse("The given user does not exist."))
+		return
+	}
+	sql = `INSERT INTO task_assignees (task_id,user_id) VALUES ($1,$2);`
+	_, err = database.DB.Exec(sql, taskID, assigneeID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
+	CreateNotification(assigneeID, fmt.Sprintf("You have been added as an asignee for task #%d", taskID))
 	c.JSON(http.StatusOK, utils.OkayResponse(req))
 }
 
@@ -426,12 +504,20 @@ func RemoveAssignee(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse("You are not authorized to perform on this project."))
 		return
 	}
-	sql := `DELETE FROM task_assignees WHERE task_id = $1 AND user_id = $2;`
+	var verifyAssigneeID int
+	sql := `SELECT u.id FROM users u WHERE u.id = $1`
+	database.DB.QueryRow(sql, assigneeID).Scan(&verifyAssigneeID)
+	if assigneeID != verifyAssigneeID {
+		c.JSON(http.StatusOK, utils.ErrorResponse("The given user does not exist."))
+		return
+	}
+	sql = `DELETE FROM task_assignees WHERE task_id = $1 AND user_id = $2;`
 	_, err = database.DB.Exec(sql, taskID, assigneeID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
+	CreateNotification(assigneeID, fmt.Sprintf("You have been removed as an asignee from task #%d.", taskID))
 	c.JSON(http.StatusOK, utils.OkayResponse(nil))
 }
 
