@@ -52,7 +52,7 @@ func ReadNotification(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse("User not logged in."))
 		return
 	}
-	pathNotificationID := c.Param("projectid")
+	pathNotificationID := c.Param("notificationid")
 	notificationID, err := strconv.Atoi(pathNotificationID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
@@ -80,7 +80,7 @@ func DeleteNotification(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse("User not logged in."))
 		return
 	}
-	pathNotificationID := c.Param("projectid")
+	pathNotificationID := c.Param("notificationid")
 	notificationID, err := strconv.Atoi(pathNotificationID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
