@@ -1,79 +1,104 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Transfer } from 'antd';
-import type { TransferDirection, TransferListProps } from 'antd/es/transfer';
+import React, { useState } from 'react';
+import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Menu } from 'antd';
+import Backlog from './module/backlog/Backlog';
+import Projects from './module/projects/Projects';
+import Task from './module/task/Task';
+import Login from './module/login/Login';
+import Register from './module/register/Register';
 
-interface RecordType {
-  key: string;
-  title: string;
-  description: string;
-  chosen: boolean;
-}
+const items: MenuProps['items'] = [
+  {
+    label: 'Project',
+    key: 'project',
+    icon: <MailOutlined />,
+  },
+  {
+    label: 'Backlog',
+    key: 'backlog',
+    icon: <AppstoreOutlined />,
+  },
+  {
+    label: 'Task',
+    key: 'task',
+    icon: <AppstoreOutlined />,
+  },
+  {
+    label: 'Login',
+    key: 'login',
+    icon: <AppstoreOutlined />,
+  },
+  {
+    label: 'Register',
+    key: 'register',
+    icon: <AppstoreOutlined />,
+  },
+  {
+    label: 'Navigation Three - Submenu',
+    key: 'SubMenu',
+    icon: <SettingOutlined />,
+    children: [
+      {
+        type: 'group',
+        label: 'Item 1',
+        children: [
+          {
+            label: 'Option 1',
+            key: 'setting:1',
+          },
+          {
+            label: 'Option 2',
+            key: 'setting:2',
+          },
+        ],
+      },
+      {
+        type: 'group',
+        label: 'Item 2',
+        children: [
+          {
+            label: 'Option 3',
+            key: 'setting:3',
+          },
+          {
+            label: 'Option 4',
+            key: 'setting:4',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: (
+      <a href="https://ant.design" target="_blank" rel="noopener noreferrer">
+        Navigation Four - Link
+      </a>
+    ),
+    key: 'alipay',
+  },
+];
 
 const App: React.FC = () => {
-  const [mockData, setMockData] = useState<RecordType[]>([]);
-  const [targetKeys, setTargetKeys] = useState<string[]>([]);
+  const [current, setCurrent] = useState('mail');
 
-  const getMock = () => {
-    const tempTargetKeys = [];
-    const tempMockData = [];
-    for (let i = 0; i < 20; i++) {
-      const data = {
-        key: i.toString(),
-        title: `content${i + 1}`,
-        description: `description of content${i + 1}`,
-        chosen: i % 2 === 0,
-      };
-      if (data.chosen) {
-        tempTargetKeys.push(data.key);
-      }
-      tempMockData.push(data);
-    }
-    setMockData(tempMockData);
-    setTargetKeys(tempTargetKeys);
-  };
+  const onClick: MenuProps['onClick'] = (e) => {
+    console.log('click ', e);
 
-  useEffect(() => {
-    getMock();
-  }, []);
+    setCurrent(e.key);
 
-  const handleChange = (newTargetKeys: string[]) => {
-    setTargetKeys(newTargetKeys);
-  };
-
-  const renderFooter = (
-    _: TransferListProps<any>,
-    { direction }: {
-      direction: TransferDirection;
-    },
-  ) => {
-    if (direction === 'left') {
-      return (
-        <Button size="small" style={{ float: 'left', margin: 5 }} onClick={getMock}>
-          Left button reload
-        </Button>
-      );
-    }
-    return (
-      <Button size="small" style={{ float: 'right', margin: 5 }} onClick={getMock}>
-        Right button reload
-      </Button>
-    );
   };
 
   return (
-    <Transfer
-      dataSource={mockData}
-      showSearch
-      listStyle={{
-        width: 250,
-        height: 300,
-      }}
-      operations={['to right', 'to left']}
-      targetKeys={targetKeys}
-      onChange={handleChange}
-      render={(item) => `${item.title}-${item.description}`}
-    />
-  );
+    <>
+      <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
+      {current === "backlog" && <Backlog />}
+      {current === "project" && <Projects />}
+      {current === "task" && <Task />}
+      {current === "login" && <Login />}
+      {current === "register" && <Register />}
+    </>
+  )
 };
 
 export default App;
