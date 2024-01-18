@@ -284,7 +284,7 @@ func UpdateTask(c *gin.Context) {
 		}
 		CreateNotification(aID, fmt.Sprintf("The task #%d that you are assigned to has been updated.", taskID))
 	}
-	sql = `SELECT t.owner_id FROM tasks WHERE t.id = $1`
+	sql = `SELECT t.owner_id FROM tasks t WHERE t.id = $1`
 	var oID int
 	err = database.DB.QueryRow(sql, taskID).Scan(&oID)
 	if err != nil {
@@ -342,7 +342,7 @@ func DeleteTask(c *gin.Context) {
 		}
 		CreateNotification(aID, fmt.Sprintf("The task #%d that you are assigned to has been deleted.", taskID))
 	}
-	sql = `SELECT t.owner_id FROM tasks WHERE t.id = $1`
+	sql = `SELECT t.owner_id FROM tasks t WHERE t.id = $1`
 	var oID int
 	err = database.DB.QueryRow(sql, taskID).Scan(&oID)
 	if err != nil {
@@ -409,7 +409,7 @@ func CreateComment(c *gin.Context) {
 		}
 		CreateNotification(aID, fmt.Sprintf("A new comment has been added to task #%d that you are assigned to.", taskID))
 	}
-	sql = `SELECT t.owner_id FROM tasks WHERE t.id = $1`
+	sql = `SELECT t.owner_id FROM tasks t WHERE t.id = $1`
 	var oID int
 	err = database.DB.QueryRow(sql, taskID).Scan(&oID)
 	if err != nil {
