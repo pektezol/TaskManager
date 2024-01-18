@@ -1,65 +1,292 @@
-import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
-import React from 'react';
-import { Avatar, List, Space } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Card, Cascader, Col, Form, Input, Modal, Row, Tag, Tooltip } from 'antd';
+import axiosInstance from '../../api/axiosInstance';
 
-const data = Array.from({ length: 23 }).map((_, i) => ({
-    href: 'https://ant.design',
-    title: `ant design part ${i}`,
-    avatar: `https://api.dicebear.com/7.x/miniavs/svg?seed=${i}`,
-    description:
-        'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-    content:
-        'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-}));
+import { useCookies } from 'react-cookie';
+import { SingleValueType } from 'rc-cascader/lib/Cascader';
+import Backlog from '../backlog/Backlog';
 
-const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
-    <Space>
-        {React.createElement(icon)}
-        {text}
-    </Space>
-);
+type Collaborator = {
+    id: number;
+    username: string;
+    email: string;
+};
+interface UserData {
+    value: string;
+    label: string;
+    // Add other fields as needed
+}
+type Owner = {
+    id: number;
+    username: string;
+    email: string;
+};
 
-const Projects: React.FC = () => (
-    <List
-        itemLayout="vertical"
-        size="large"
-        pagination={{
-            onChange: (page) => {
-                console.log(page);
-            },
-            pageSize: 3,
-        }}
-        dataSource={data}
-        footer={
-            <div>
-                <b>ant design</b> footer part
-            </div>
+type Project = {
+    id: number;
+    username: string;
+    owner: Owner;
+    collaborators: Collaborator[];
+    created_at: string;
+};
+
+type FieldType = {
+    name?: string;
+};
+
+interface DecodedToken {
+    sub: string; // Example field, update with your actual token structure
+    exp: number;
+    // Add other fields according to your JWT payload structure
+}
+
+
+const Projects: React.FC = () => {
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [reload, setReload] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpenC, setIsModalOpenC] = useState(false);
+    const [backlog, setBacklog] = useState<Project>();
+    const [allUsers, setAllUsers] = useState<UserData[]>([]);
+    const [selectedCollaborator, setSelectedCollaborator] = useState("");
+    const [selectedCollaboratorProject, setSelectedCollaboratorProject] = useState<number | undefined>(undefined);
+    const [usermail, setUserMail] = useState("");
+    const [cookies, setCookie] = useCookies(['myCookie']);
+
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+    const showCollaboratorsModal = (project_id: number) => {
+        setIsModalOpenC(true);
+        setSelectedCollaboratorProject(project_id)
+    };
+    const removeCollaborators = (project_id: number, user_id: number) => {
+        console.log(project_id, user_id);
+        axiosInstance
+            .delete(`/projects/${project_id}/collaborator/${user_id}`,)
+            .then(() => {
+                setProjects([]);
+                setReload(true);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    };
+    const collaboratorSubmit = () => {
+        // Convert the selectedCollaborator to a number
+        const collaboratorId = parseInt(selectedCollaborator, 10);
+
+        if (isNaN(collaboratorId)) {
+            // Handle the case where the conversion fails
+            console.error('Invalid collaborator ID:', selectedCollaborator);
+            return;
         }
-        renderItem={(item) => (
-            <List.Item
-                key={item.title}
-                actions={[
-                    <IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-                    <IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
-                    <IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
-                ]}
-                extra={
-                    <img
-                        width={272}
-                        alt="logo"
-                        src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                    />
-                }
-            >
-                <List.Item.Meta
-                    avatar={<Avatar src={item.avatar} />}
-                    title={<a href={item.href}>{item.title}</a>}
-                    description={item.description}
-                />
-                {item.content}
-            </List.Item>
-        )}
-    />
-);
 
+        axiosInstance
+            .post(`/projects/${selectedCollaboratorProject}/collaborator`, { user_id: collaboratorId })
+            .then(() => {
+                setProjects([]);
+                setReload(true);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        setSelectedCollaborator("")
+        setSelectedCollaboratorProject(0)
+    };
+
+    const handleCancelC = () => {
+        setIsModalOpenC(false);
+    };
+
+    const onFinish = (values: any) => {
+        createProject(values.name)
+    };
+
+    const onFinishFailed = (errorInfo: any) => {
+        console.log('Failed:', errorInfo);
+    };
+    const onChangeCollaborator = (value: SingleValueType) => {
+        console.log(value.toString());
+        setSelectedCollaborator(value.toString())
+    };
+    const createProject = (value: string) => {
+        axiosInstance
+            .post('/projects', { name: value })
+            .then(response => {
+                setProjects([]);
+                setReload(true)
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    const deleteProject = (value: number) => {
+        axiosInstance
+            .delete(`/projects/${value}`,)
+            .then(() => {
+                setProjects([]);
+                setReload(true)
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    const parseJwtToken = (token: string): DecodedToken | null => {
+        try {
+            // Split the token into header, payload, and signature
+            const [, payloadBase64] = token.split('.');
+            const decodedPayload = JSON.parse(atob(payloadBase64)) as DecodedToken;
+            return decodedPayload;
+        } catch (error) {
+            // Handle invalid or expired tokens
+            console.error('Error parsing JWT token:');
+            return null;
+        }
+    };
+
+    const getAllUsers = () => {
+        axiosInstance
+            .get('/users', {})
+            .then(response => {
+
+                const data: UserData[] = []
+                for (let index = 0; index < response.data.data.users.length; index++) {
+                    const element: UserData = {
+                        value: `${response.data.data.users[index].id}`,
+                        label: `${response.data.data.users[index].username}`
+                    }
+                    data.push(element)
+                }
+                setAllUsers(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    useEffect(() => {
+        getAllUsers()
+        const token = cookies.myCookie;
+        const decodedToken = parseJwtToken(token);
+
+        if (decodedToken) {
+            setUserMail(decodedToken.sub)
+        } else {
+            console.log('Invalid or expired token');
+        }
+
+        axiosInstance
+            .get('/projects', {})
+            .then(response => {
+                setProjects(response.data.data.projects);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        setReload(false)
+    }, [reload]);
+
+    return (
+        <>
+            <Card
+                title="Projects"
+                style={{ marginTop: 10 }}
+                extra={
+                    <Button type="primary" onClick={showModal}>
+                        Create Project
+                    </Button>}
+            >
+                {projects ? (
+                    projects.map((item, index) => (
+                        <Card
+                            key={index}
+                            style={{ marginTop: 16 }}
+                            type="inner"
+                            title={<Button type="text" onClick={() => setBacklog(item)}>{item.username} - Created at: {item.created_at.split("T")[0]} {item.created_at.split("T")[1].split(".")[0]}</Button>}
+                            extra={item.owner.email === usermail ?
+                                <>
+                                    <Button type="text" danger onClick={() => deleteProject(item.id)}>
+                                        Delete This Project
+                                    </Button>
+                                    <Button type="text" onClick={() => showCollaboratorsModal(item.id)}>
+                                        Add Collaborators
+                                    </Button>
+                                </>
+                                : ""}
+                        >
+                            <Row>
+                                <Col span={4}>
+                                    Owner :
+                                    <Tag> {` ${item.owner.username}  `} </Tag>
+                                </Col>
+                                <Col>
+                                    Collaborators :
+                                    {item.collaborators.map((val, i) => (
+                                        <>
+                                            {item.owner.email === usermail ?
+                                                <>
+                                                    <Tooltip title={<Button size='small' type="link" danger onClick={() => removeCollaborators(item.id, val.id)}>
+                                                        Remove Collaborator
+                                                    </Button>} key={"red"}>
+                                                        <Tag>  {val.username}   </Tag>
+                                                    </Tooltip>
+                                                </>
+                                                :
+                                                <>
+                                                    <Tag>  {val.username}   </Tag>
+                                                </>}
+                                        </>
+                                    ))}
+                                </Col>
+                            </Row>
+                        </Card>
+                    ))
+                ) : (
+                    <p>Loading...</p>
+                )}
+                <Modal title="Create Project" open={isModalOpen} onCancel={handleCancel} footer={null}>
+                    <Form
+                        name="basic"
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                        style={{ maxWidth: 600 }}
+                        initialValues={{ remember: true }}
+                        onFinish={onFinish}
+                        onFinishFailed={onFinishFailed}
+                        autoComplete="off"
+                    >
+                        <Form.Item<FieldType>
+                            label="Project Name"
+                            name="name"
+                            rules={[{ required: true, message: 'Please input your username!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+
+                        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                            <Button type="primary" htmlType="submit">
+                                Submit
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+                <Modal title="Add Collaborators" open={isModalOpenC} onCancel={handleCancelC} footer={null}>
+                    <Cascader options={allUsers} onChange={(e) => onChangeCollaborator(e)} placeholder="Please select" style={{ marginLeft: 85 }} />
+                    <Button type="primary" style={{ marginLeft: 25 }}
+                        onClick={() => collaboratorSubmit()}
+                    >
+                        Submit
+                    </Button>
+                </Modal>
+
+            </Card>
+            {backlog !== undefined ? <Backlog /> : ""}
+
+        </>
+    );
+};
 export default Projects;

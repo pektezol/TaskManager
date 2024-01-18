@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
@@ -7,6 +7,7 @@ import Projects from './module/projects/Projects';
 import Task from './module/task/Task';
 import Login from './module/login/Login';
 import Register from './module/register/Register';
+import { useCookies } from 'react-cookie';
 
 const items: MenuProps['items'] = [
   {
@@ -81,22 +82,32 @@ const items: MenuProps['items'] = [
 
 const App: React.FC = () => {
   const [current, setCurrent] = useState('mail');
+  const [cookies, setCookie] = useCookies(['myCookie']);
+
+  // Set a cookie
+  const handleSetCookie = (token: string) => {
+    setCookie('myCookie', token);
+  };
 
   const onClick: MenuProps['onClick'] = (e) => {
     console.log('click ', e);
-
     setCurrent(e.key);
-
   };
+
 
   return (
     <>
-      <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
-      {current === "backlog" && <Backlog />}
-      {current === "project" && <Projects />}
-      {current === "task" && <Task />}
-      {current === "login" && <Login />}
-      {current === "register" && <Register />}
+      {(cookies.myCookie === "" || cookies.myCookie === undefined) ? <Login /> :
+        <>
+          <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
+          {current === "backlog" && <Backlog />}
+          {current === "project" && <Projects />}
+          {current === "task" && <Task />}
+          {current === "login" && <Login />}
+          {current === "register" && <Register />}
+        </>
+      }
+
     </>
   )
 };
