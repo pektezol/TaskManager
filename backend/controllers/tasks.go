@@ -269,7 +269,7 @@ func UpdateTask(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
-	sql = `SELECT a.id FROM task_assignees a WHERE a.task_id = $1`
+	sql = `SELECT a.user_id FROM task_assignees a WHERE a.task_id = $1`
 	rows, err := database.DB.Query(sql, taskID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
@@ -327,7 +327,7 @@ func DeleteTask(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
-	sql = `SELECT a.id FROM task_assignees a WHERE a.task_id = $1`
+	sql = `SELECT a.user_id FROM task_assignees a WHERE a.task_id = $1`
 	rows, err := database.DB.Query(sql, taskID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
@@ -394,7 +394,7 @@ func CreateComment(c *gin.Context) {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
 	}
-	sql = `SELECT a.id FROM task_assignees a WHERE a.task_id = $1`
+	sql = `SELECT a.user_id FROM task_assignees a WHERE a.task_id = $1`
 	rows, err := database.DB.Query(sql, taskID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
