@@ -5,6 +5,9 @@ import axiosInstance from '../../api/axiosInstance';
 import { useCookies } from 'react-cookie';
 import { SingleValueType } from 'rc-cascader/lib/Cascader';
 import Backlog from '../backlog/Backlog';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../state/store';
+import { incrementByAmount } from '../../state/counterSlice';
 
 type Collaborator = {
     id: number;
@@ -46,12 +49,14 @@ const Projects: React.FC = () => {
     const [reload, setReload] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalOpenC, setIsModalOpenC] = useState(false);
-    const [backlog, setBacklog] = useState<Project>();
     const [allUsers, setAllUsers] = useState<UserData[]>([]);
     const [selectedCollaborator, setSelectedCollaborator] = useState("");
     const [selectedCollaboratorProject, setSelectedCollaboratorProject] = useState<number | undefined>(undefined);
     const [usermail, setUserMail] = useState("");
     const [cookies, setCookie] = useCookies(['myCookie']);
+
+    const count = useSelector((state: RootState) => state.counter.value)
+    const dispatch = useDispatch()
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -62,6 +67,9 @@ const Projects: React.FC = () => {
     const showCollaboratorsModal = (project_id: number) => {
         setIsModalOpenC(true);
         setSelectedCollaboratorProject(project_id)
+    };
+    const openTasks = (project: number) => {
+        dispatch(incrementByAmount(project))
     };
     const removeCollaborators = (project_id: number, user_id: number) => {
         console.log(project_id, user_id);
@@ -75,6 +83,7 @@ const Projects: React.FC = () => {
                 console.error('Error:', error);
             });
     };
+
     const collaboratorSubmit = () => {
         // Convert the selectedCollaborator to a number
         const collaboratorId = parseInt(selectedCollaborator, 10);
@@ -190,6 +199,8 @@ const Projects: React.FC = () => {
         setReload(false)
     }, [reload]);
 
+
+
     return (
         <>
             <Card
@@ -206,7 +217,7 @@ const Projects: React.FC = () => {
                             key={index}
                             style={{ marginTop: 16 }}
                             type="inner"
-                            title={<Button type="text" onClick={() => setBacklog(item)}>{item.username} - Created at: {item.created_at.split("T")[0]} {item.created_at.split("T")[1].split(".")[0]}</Button>}
+                            title={<Button type="text" onClick={() => { openTasks(item.id) }}>{item.username} - Created at: {item.created_at.split("T")[0]} {item.created_at.split("T")[1].split(".")[0]}</Button>}
                             extra={item.owner.email === usermail ?
                                 <>
                                     <Button type="text" danger onClick={() => deleteProject(item.id)}>
@@ -284,7 +295,7 @@ const Projects: React.FC = () => {
                 </Modal>
 
             </Card>
-            {backlog !== undefined ? <Backlog /> : ""}
+            {count !== 0 ? <Backlog /> : ""}
 
         </>
     );

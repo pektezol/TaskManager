@@ -100,7 +100,7 @@ const App: React.FC = () => {
       {(cookies.myCookie === "" || cookies.myCookie === undefined) ? <Login /> :
         <>
           <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
-          {current === "backlog" && <Backlog />}
+          {/* {current === "backlog" && <Backlog />} */}
           {current === "project" && <Projects />}
           {current === "task" && <Task />}
           {current === "login" && <Login />}
