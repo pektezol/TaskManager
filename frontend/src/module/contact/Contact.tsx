@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Form, Input, Typography } from 'antd';
+import axios from 'axios';
 
 const { Title } = Typography;
 
@@ -8,17 +9,22 @@ const layout = {
   wrapperCol: { span: 16 },
 };
 
-/* eslint-disable no-template-curly-in-string */
 const validateMessages = {
   required: '${label} is required!',
   types: {
     email: '${label} is not a valid email!',
   },
 };
-/* eslint-enable no-template-curly-in-string */
 
-const onFinish = (values: any) => {
-  console.log(values);
+const onFinish = async (values: any) => {
+  try {
+
+    await axios.post('https://task.ardapektezol.com/api/contact', values.user);
+
+    console.log('Successfully', values);
+  } catch (error) {
+    console.error('Error', error);
+  }
 };
 
 const Contact: React.FC = () => (
@@ -37,13 +43,13 @@ const Contact: React.FC = () => (
       <Form.Item name={['user', 'surname']} label="Surname" rules={[{ required: true }]}>
         <Input style={{ width: '100%' }} />
       </Form.Item>
-      <Form.Item name={['user', 'email']} label="Email" rules={[{ required: true }]}>
+      <Form.Item name={['user', 'email']} label="Email" rules={[{ type: 'email', required: true }]}>
         <Input style={{ width: '100%' }} />
       </Form.Item>
-      <Form.Item name={['user', 'website']} label="Address">
+      <Form.Item name={['user', 'address']} label="Address" rules={[{ required: true }]}>
         <Input style={{ width: '100%' }} />
       </Form.Item>
-      <Form.Item name={['user', 'questions']} label="Questions">
+      <Form.Item name={['user', 'question']} label="Question" rules={[{ required: true }]}>
         <Input.TextArea style={{ width: '100%' }} />
       </Form.Item>
       <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
