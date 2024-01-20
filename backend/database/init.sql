@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS "notifications" CASCADE;
 DROP TABLE IF EXISTS "tasks" CASCADE;
 DROP TABLE IF EXISTS "task_assignees" CASCADE;
 DROP TABLE IF EXISTS "task_comments" CASCADE;
+DROP TABLE IF EXISTS "contact" CASCADE;
 
 CREATE TABLE "users" (
     id SERIAL PRIMARY KEY,
@@ -82,4 +83,13 @@ CREATE TABLE "task_comments" (
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     FOREIGN KEY (task_id) REFERENCES tasks(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE "contact" (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    surname TEXT NOT NULL,
+    email TEXT NOT NULL,
+    address TEXT NOT NULL,
+    question TEXT NOT NULL
 );

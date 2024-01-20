@@ -245,3 +245,26 @@ func RemoveCollaborator(c *gin.Context) {
 	CreateNotification(userID, fmt.Sprintf("You are removed from the project: \"%s\" as a collaborator.", projectName))
 	c.JSON(http.StatusOK, utils.OkayResponse(nil))
 }
+
+func Contact(c *gin.Context) {
+	type ContactSendRequest struct {
+		Name     string `json:"name" binding:"required"`
+		Surname  string `json:"surname" binding:"required"`
+		Email    string `json:"email" binding:"required"`
+		Address  string `json:"address" binding:"required"`
+		Question string `json:"question" binding:"required"`
+	}
+	var req ContactSendRequest
+	err := c.BindJSON(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+		return
+	}
+	sql := `INSERT INTO contact ("name", surname, email, address, question) VALUES($1, $2, $3, $4, $5);`
+	_, err = database.DB.Exec(sql)
+	if err != nil {
+		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, utils.OkayResponse(nil))
+}

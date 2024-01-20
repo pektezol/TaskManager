@@ -37,5 +37,7 @@ func InitRoutes(router *gin.Engine) {
 		api.GET("/notifications", CheckAuth, controllers.ListNotifications)                     // notification list
 		api.PUT("/notifications/:notificationid", CheckAuth, controllers.ReadNotification)      // notification update
 		api.DELETE("/notifications/:notificationid", CheckAuth, controllers.DeleteNotification) // notification delete
+		// contact
+		api.POST("/contact", controllers.Contact) // contact
 	}
 }
