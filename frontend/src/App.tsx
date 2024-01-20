@@ -7,6 +7,8 @@ import Projects from './module/projects/Projects';
 import Task from './module/task/Task';
 import Login from './module/login/Login';
 import Register from './module/register/Register';
+import Contact from './module/contact/Contact';
+
 import { useCookies } from 'react-cookie';
 
 const items: MenuProps['items'] = [
@@ -33,6 +35,11 @@ const items: MenuProps['items'] = [
   {
     label: 'Register',
     key: 'register',
+    icon: <AppstoreOutlined />,
+  },
+  {
+    label: 'Contact',
+    key: 'contact',
     icon: <AppstoreOutlined />,
   },
   {
@@ -105,6 +112,7 @@ const App: React.FC = () => {
           {current === "task" && <Task />}
           {current === "login" && <Login />}
           {current === "register" && <Register />}
+          {current === "contact" && <Contact />}
         </>
       }
 
