@@ -26,7 +26,7 @@ func ListTasks(c *gin.Context) {
 	var validateUserIsOwner int
 	var validateUserIsCollaborator int
 	database.DB.QueryRow("SELECT id FROM projects WHERE id = $1 AND owner_id = $2;", projectID, userID).Scan(&validateUserIsOwner)
-	database.DB.QueryRow("SELECT id FROM project_collaborators WHERE project_id = $1 AND user_id = $2;", projectID, userID).Scan(&validateUserIsCollaborator)
+	database.DB.QueryRow("SELECT user_id FROM project_collaborators WHERE project_id = $1 AND user_id = $2;", projectID, userID).Scan(&validateUserIsCollaborator)
 	if validateUserIsOwner == 0 && validateUserIsCollaborator == 0 {
 		c.JSON(http.StatusOK, utils.ErrorResponse("You are not authorized to perform on this project."))
 		return
