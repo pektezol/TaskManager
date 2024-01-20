@@ -36,7 +36,6 @@ func CheckAuth(c *gin.Context) {
 		}
 		var customerID int
 		database.DB.QueryRow(`SELECT id FROM users WHERE email = $1`, claims["sub"]).Scan(&customerID)
-		fmt.Println("helo")
 		if customerID == 0 {
 			c.Next()
 			return
