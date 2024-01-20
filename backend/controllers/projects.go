@@ -12,7 +12,7 @@ import (
 )
 
 func ListProjects(c *gin.Context) {
-	_, exists := c.Get("user")
+	userID, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusOK, utils.ErrorResponse("User not logged in."))
 		return
@@ -21,8 +21,8 @@ func ListProjects(c *gin.Context) {
 		Projects []utils.Project `json:"projects"`
 	}
 	projects := []utils.Project{}
-	sql := `SELECT p.id, p.name, p.created_at, u.id, u.username, u.email FROM projects p JOIN users u ON p.owner_id = u.id WHERE p.active = true;`
-	rows, err := database.DB.Query(sql)
+	sql := `SELECT p.id, p.name, p.created_at, u.id, u.username, u.email FROM projects p JOIN users u ON p.owner_id = u.id WHERE p.active = true and p.owner_id = $1 OR p.id IN (SELECT pc.project_id FROM project_collaborators pc JOIN projects p ON pc.project_id = p.id WHERE pc.user_id = $1 AND p.active = true);`
+	rows, err := database.DB.Query(sql, userID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
