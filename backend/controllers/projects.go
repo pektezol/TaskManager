@@ -261,7 +261,7 @@ func Contact(c *gin.Context) {
 		return
 	}
 	sql := `INSERT INTO contact ("name", surname, email, address, question) VALUES($1, $2, $3, $4, $5);`
-	_, err = database.DB.Exec(sql)
+	_, err = database.DB.Exec(sql, req.Name, req.Surname, req.Email, req.Address, req.Question)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
