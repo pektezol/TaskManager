@@ -30,8 +30,8 @@ type FieldType = {
     name: string;
     description: string;
     deadline: string;
-    status_id: number;
-    priority_id: number;
+    status_id: number | undefined;
+    priority_id: number | undefined;
 };
 interface Comment {
     comment: string;
@@ -43,9 +43,14 @@ interface Comment {
     created_at: string;
     id: number;
 }
-interface Task {
+interface Assignee {
+    id: number;
+    username: string;
+    email: string;
 
-    assignees: any[];
+}
+interface Task {
+    assignees: Assignee[];
     comments: Comment[];
     created_at: string;
     deadline: string;
@@ -93,7 +98,7 @@ const tabListNoTitle = [
 ];
 
 const Backlog: React.FC = () => {
-    const [activeTabKey2, setActiveTabKey2] = useState<string>('app');
+    const [activeTabKey2, setActiveTabKey2] = useState<string>('tasks');
     const [taskData, setTaskData] = useState<Task[]>([]);
     const [task, setTask] = useState<Task | undefined>();
     const [statusData, setStatusData] = useState<TaskData[]>([]);
@@ -102,10 +107,12 @@ const Backlog: React.FC = () => {
     const count = useSelector((state: RootState) => state.counter.value)
     const [isModalOpenAss, setIsModalOpenAss] = useState(false);
     const [isModalOpenC, setIsModalOpenC] = useState(false);
+    const [taskUpdateModal, setTaskUpdateModal] = useState(false);
     const [openTaskModal, setOpenTaskModal] = useState(false);
     const [selectedCollaboratorProject, setSelectedCollaboratorProject] = useState<number | undefined>(undefined);
     const [allUsers, setAllUsers] = useState<UserData[]>([]);
     const [selectedCollaborator, setSelectedCollaborator] = useState("");
+    const [updateTaskData, setUpdateTaskData] = useState("2024-02-02");
 
     const showCollaboratorsModal = (project_id: number) => {
         isModalOpenAss === true ? setIsModalOpenAss(false) : setIsModalOpenAss(true)
@@ -154,6 +161,37 @@ const Backlog: React.FC = () => {
                 console.log(response.data);
                 getTasks()
                 handleCancelC()
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    };
+    const onFinishUpdateTask = (values: any) => {
+        const foundPriority = priorityData.find((priority) => priority.label === task?.priority);
+        const foundStatus = statusData.find((status) => status.label === task?.status);
+        const value: FieldType = {
+            name: `${values.name === undefined ? task?.name : values.name}`,
+            description: `${values.description === undefined ? task?.description : values.description}`,
+            deadline: `${values.deadline === undefined ? task?.deadline.split("T")[0] : updateTaskData}`,
+            status_id: values.status_id === undefined ? Number(foundStatus?.value) : Number(values.status_id[0]),
+            priority_id: values.priority_id === undefined ? Number(foundPriority?.value) : Number(values.priority_id[0]),
+        };
+        console.log(value);
+
+        axiosInstance
+            .put(`/projects/${count}/tasks/${task?.id}`,
+                value
+            )
+            .then((response) => {
+                console.log(response.data);
+                if (task?.id !== undefined) {
+                    getTasksDetail(task.id);
+                } else {
+                    // Handle the case where task.id is undefined
+                    console.error("Task ID is undefined");
+                }
+                getTasks()
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -173,20 +211,6 @@ const Backlog: React.FC = () => {
         setActiveTabKey2(key);
     };
 
-    const data = [
-        {
-            title: 'Ant Design Title 1',
-        },
-        {
-            title: 'Ant Design Title 2',
-        },
-        {
-            title: 'Ant Design Title 3',
-        },
-        {
-            title: 'Ant Design Title 4',
-        },
-    ];
     const getTasksDetail = (id: number) => {
         axiosInstance
             .get(`/projects/${count}/tasks/${id}`,
@@ -202,6 +226,10 @@ const Backlog: React.FC = () => {
     }
     const onChangeCreateDate: DatePickerProps['onChange'] = (date, dateString) => {
         setCreateTaskDate(dateString)
+        console.log(createTaskDate);
+    };
+    const onChangeUpdateDate: DatePickerProps['onChange'] = (date, dateString) => {
+        setUpdateTaskData(dateString)
         console.log(createTaskDate);
     };
     const onChange = (value: SingleValueType, item: Task) => {
@@ -350,6 +378,10 @@ const Backlog: React.FC = () => {
             });
     };
 
+    function moment(deadline: string): import("dayjs").Dayjs | undefined {
+        throw new Error('Function not implemented.');
+    }
+
     return (
         <>
             <br />
@@ -407,7 +439,13 @@ const Backlog: React.FC = () => {
                                                             Deadline: <Tag>{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
                                                         </Col>
                                                     </Row>
-                                                    <Cascader size='small' options={statusData} onChange={(e) => onChange(e, item)} placeholder="Select Status" />
+                                                    <Cascader
+                                                        size='small'
+                                                        defaultValue={item.status ? [item.status] : undefined}
+                                                        options={statusData}
+                                                        onChange={(e) => onChange(e, item)}
+                                                        placeholder="Select Status"
+                                                    />
                                                 </Card>}
                                         </>
                                     ))}
@@ -445,7 +483,13 @@ const Backlog: React.FC = () => {
                                                             Deadline: <Tag>{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
                                                         </Col>
                                                     </Row>
-                                                    <Cascader size='small' options={statusData} onChange={(e) => onChange(e, item)} placeholder="Select Status" />
+                                                    <Cascader
+                                                        size='small'
+                                                        defaultValue={item.status ? [item.status] : undefined}
+                                                        options={statusData}
+                                                        onChange={(e) => onChange(e, item)}
+                                                        placeholder="Select Status"
+                                                    />
                                                 </Card>}
                                         </>
                                     ))}
@@ -483,7 +527,13 @@ const Backlog: React.FC = () => {
                                                             Deadline: <Tag>{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
                                                         </Col>
                                                     </Row>
-                                                    <Cascader size='small' options={statusData} onChange={(e) => onChange(e, item)} placeholder="Select Status" />
+                                                    <Cascader
+                                                        size='small'
+                                                        defaultValue={item.status ? [item.status] : undefined}
+                                                        options={statusData}
+                                                        onChange={(e) => onChange(e, item)}
+                                                        placeholder="Select Status"
+                                                    />
                                                 </Card>}
                                         </>
                                     ))}
@@ -521,7 +571,13 @@ const Backlog: React.FC = () => {
                                                             Deadline: <Tag>{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
                                                         </Col>
                                                     </Row>
-                                                    <Cascader size='small' options={statusData} onChange={(e) => onChange(e, item)} placeholder="Select Status" />
+                                                    <Cascader
+                                                        size='small'
+                                                        defaultValue={item.status ? [item.status] : undefined}
+                                                        options={statusData}
+                                                        onChange={(e) => onChange(e, item)}
+                                                        placeholder="Select Status"
+                                                    />
                                                 </Card>}
                                         </>
                                     ))}
@@ -635,16 +691,79 @@ const Backlog: React.FC = () => {
                                     Status : <Tag>{task?.status}</Tag>
                                 </Col>
                             </Row>
-                            {isModalOpenAss === true && <Row style={{ marginTop: 20 }}>
-                                <Col span={24}>
-                                    <Cascader size='small' options={allUsers} onChange={(e) => onChangeCollaborator(e)} placeholder="Please select" style={{ marginLeft: 5 }} />
-                                    <Button type="primary" size='small' style={{ marginLeft: 5 }}
-                                        onClick={() => task?.id !== undefined && collaboratorSubmit(task?.id)}
-                                    >
-                                        Submit
-                                    </Button>
+
+                            <Row style={{ marginTop: 20 }}>
+                                <Col span={12}>
+                                    {isModalOpenAss === true &&
+                                        <>
+                                            <Cascader size='small' options={allUsers} onChange={(e) => onChangeCollaborator(e)} placeholder="Please select" style={{ marginLeft: 5 }} />
+                                            <Button type="primary" size='small' style={{ marginLeft: 5 }}
+                                                onClick={() => task?.id !== undefined && collaboratorSubmit(task?.id)}
+                                            >
+                                                Submit
+                                            </Button>
+                                        </>}
                                 </Col>
-                            </Row>}
+                                <Col span={12}>
+                                    {taskUpdateModal === true ? <Button style={{ marginLeft: 130 }} onClick={() => setTaskUpdateModal(false)}>
+                                        Update Task
+                                    </Button> : <Button style={{ marginLeft: 130 }} onClick={() => setTaskUpdateModal(true)}>
+                                        Update Task
+                                    </Button>
+
+                                    }
+                                </Col>
+                            </Row>
+                            {taskUpdateModal === true &&
+                                <Row style={{ marginTop: 20 }}>
+                                    <Form
+                                        name="task update"
+                                        labelCol={{ span: 720 }}
+                                        style={{ maxWidth: 1600 }}
+                                        initialValues={{ remember: true }}
+                                        onFinish={onFinishUpdateTask}
+                                        autoComplete="off"
+                                        layout="inline"
+
+                                    >
+                                        <Form.Item<FieldType>
+                                            label="Name"
+                                            name="name"
+                                        >
+                                            <Input defaultValue={task?.name} />
+                                        </Form.Item>
+                                        <Form.Item<FieldType>
+                                            label="Description"
+                                            name="description"
+                                        >
+                                            <Input defaultValue={task?.description} />
+                                        </Form.Item>
+                                        <Form.Item<FieldType>
+                                            label="Status"
+                                            name="status_id"
+                                        >
+                                            <Cascader defaultValue={task?.status ? [task.status] : undefined} options={statusData} placeholder="Select Status" />
+                                        </Form.Item>
+                                        <Form.Item<FieldType>
+                                            label="Priority"
+                                            name="priority_id"
+                                        >
+                                            <Cascader defaultValue={task?.priority ? [task.priority] : undefined} options={priorityData} placeholder="Select Priority" />
+                                        </Form.Item>
+                                        <Form.Item<FieldType>
+                                            label="Deadline"
+                                            name="deadline"
+                                        >
+                                            <DatePicker onChange={onChangeUpdateDate} />
+                                        </Form.Item>
+                                        <Form.Item  >
+                                            <Button type="primary" htmlType="submit">
+                                                Submit
+                                            </Button>
+                                        </Form.Item>
+                                    </Form>
+                                </Row>
+                            }
                             <Row style={{ marginTop: 50 }}>
 
                                 <Col span={24}>
@@ -678,7 +797,6 @@ const Backlog: React.FC = () => {
                                                         description={item.comment}
                                                     />
                                                     <div style={{ marginRight: 15 }}>{item.created_at.split("T")[0]}</div>
-                                                    <div> Content</div>
                                                 </List.Item>
                                             )}
                                         />
@@ -695,19 +813,34 @@ const Backlog: React.FC = () => {
                             size='small'
                             style={{ marginTop: 16 }}
                             type="inner"
-                            title="Priority..."
+                            title={priorityData[2].label}
                             extra={<a href="#">More</a>}
                         >
                             <List
                                 size='small'
                                 itemLayout="horizontal"
-                                dataSource={data}
+                                dataSource={taskData.filter(task => task.priority === priorityData[2].label)}
                                 renderItem={(item, index) => (
                                     <List.Item>
                                         <List.Item.Meta
-                                            avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-                                            title={<a href="https://ant.design">{item.title}</a>}
-                                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                                            title={
+                                                <div>
+                                                    <>{item.name}</> - <>Deadline: {item.deadline.split("T")[0]}</>
+                                                </div>
+                                            }
+                                            description={
+                                                <>
+                                                    <div>{item.description}</div>
+                                                    <div>
+                                                        <Tag style={{ marginRight: 8 }}>{item.status}</Tag>
+                                                        {item.assignees?.map((assignee) => (
+                                                            <Tag key={assignee.id} style={{ marginLeft: 8 }}>
+                                                                {assignee.username}
+                                                            </Tag>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            }
                                         />
                                     </List.Item>
                                 )}
@@ -717,19 +850,34 @@ const Backlog: React.FC = () => {
                             size='small'
                             style={{ marginTop: 16 }}
                             type="inner"
-                            title="Priority..."
+                            title={priorityData[1].label}
                             extra={<a href="#">More</a>}
                         >
                             <List
                                 size='small'
                                 itemLayout="horizontal"
-                                dataSource={data}
+                                dataSource={taskData.filter(task => task.priority === priorityData[1].label)}
                                 renderItem={(item, index) => (
                                     <List.Item>
                                         <List.Item.Meta
-                                            avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-                                            title={<a href="https://ant.design">{item.title}</a>}
-                                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                                            title={
+                                                <div>
+                                                    <>{item.name}</> - <>Deadline: {item.deadline.split("T")[0]}</>
+                                                </div>
+                                            }
+                                            description={
+                                                <>
+                                                    <div>{item.description}</div>
+                                                    <div>
+                                                        <Tag style={{ marginRight: 8 }}>{item.status}</Tag>
+                                                        {item.assignees?.map((assignee) => (
+                                                            <Tag key={assignee.id} style={{ marginLeft: 8 }}>
+                                                                {assignee.username}
+                                                            </Tag>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            }
                                         />
                                     </List.Item>
                                 )}
@@ -738,20 +886,35 @@ const Backlog: React.FC = () => {
                         <Card
                             style={{ marginTop: 16 }}
                             type="inner"
-                            title="Priority..."
+                            title={priorityData[0].label}
                             extra={<a href="#">More</a>}
                             size='small'
                         >
                             <List
                                 size='small'
                                 itemLayout="horizontal"
-                                dataSource={data}
+                                dataSource={taskData.filter(task => task.priority === priorityData[0].label)}
                                 renderItem={(item, index) => (
                                     <List.Item>
                                         <List.Item.Meta
-                                            avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-                                            title={<a href="https://ant.design">{item.title}</a>}
-                                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                                            title={
+                                                <div>
+                                                    <>{item.name}</> - <>Deadline: {item.deadline.split("T")[0]}</>
+                                                </div>
+                                            }
+                                            description={
+                                                <>
+                                                    <div>{item.description}</div>
+                                                    <div>
+                                                        <Tag style={{ marginRight: 8 }}>{item.status}</Tag>
+                                                        {item.assignees?.map((assignee) => (
+                                                            <Tag key={assignee.id} style={{ marginLeft: 8 }}>
+                                                                {assignee.username}
+                                                            </Tag>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            }
                                         />
                                     </List.Item>
                                 )}
