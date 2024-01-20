@@ -30,7 +30,8 @@ CREATE TABLE "project_collaborators" (
     project_id INT NOT NULL,
     user_id INT NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE (project_id, user_id)
 );
 
 CREATE TABLE "status" (
@@ -72,7 +73,8 @@ CREATE TABLE "task_assignees" (
     task_id INT NOT NULL,
     user_id INT NOT NULL,
     FOREIGN KEY (task_id) REFERENCES tasks(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE (task_id, user_id)
 );
 
 CREATE TABLE "task_comments" (
