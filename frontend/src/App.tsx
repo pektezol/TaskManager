@@ -42,6 +42,11 @@ const App: React.FC = () => {
       icon: <MailOutlined />,
     },
     {
+      label: 'Contact',
+      key: 'contact',
+      icon: <MailOutlined />,
+    },
+    {
       label: `Log Out (${usermail})`,
       key: 'logout',
       icon: <LogoutOutlined />,
@@ -144,6 +149,7 @@ const App: React.FC = () => {
             <Col span={20}>
               {current === "project" && <Projects />}
               {current === "weather" && <Weather />}
+              {current === "contact" && <Contact />}
             </Col>
             <Col span={4}>
               <div>
