@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenStreetMap with Latitude, Longitude, and Weather</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id="map" style="height: 500px;"></div>
+
+    <script>
+        var map = L.map('map').setView([41.108, 29.008], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        map.on('click', function (e) {
+            var lat = e.latlng.lat.toFixed(6);
+            var lng = e.latlng.lng.toFixed(6);
+
+            $.ajax({
+                url: `http://api.weatherapi.com/v1/current.json?key=5c028746d8b14fb8925103513242001&q=${lat},${lng}&aqi=no`,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    alert("Weather in " + data.location.name + ", " + data.location.region + ": " + data.current.condition.text + " with a temperature of " + data.current.temp_c + "Â°C");
+                },
+                error: function () {
+                    alert("Error retrieving weather data");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

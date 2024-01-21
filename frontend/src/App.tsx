@@ -11,6 +11,7 @@ import Contact from './module/contact/Contact';
 import { useCookies } from 'react-cookie';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
 import axiosInstance from './api/axiosInstance';
+import Weather from './module/weather/Weather';
 
 interface DecodedToken {
   sub: string; // Example field, update with your actual token structure
@@ -35,7 +36,11 @@ const App: React.FC = () => {
       key: 'project',
       icon: <MailOutlined />,
     },
-
+    {
+      label: 'Weather',
+      key: 'weather',
+      icon: <MailOutlined />,
+    },
     {
       label: `Log Out (${usermail})`,
       key: 'logout',
@@ -138,6 +143,7 @@ const App: React.FC = () => {
           <Row>
             <Col span={20}>
               {current === "project" && <Projects />}
+              {current === "weather" && <Weather />}
             </Col>
             <Col span={4}>
               <div>

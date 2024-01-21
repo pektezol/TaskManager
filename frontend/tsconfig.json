@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "types": [
+      "leaflet"
+    ],
     "target": "es5",
     "lib": [
       "dom",
