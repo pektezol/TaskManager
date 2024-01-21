@@ -1,11 +1,17 @@
-import React from 'react';
-import { Button, Form, Input, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Checkbox, Form, Input, Typography } from 'antd';
 import axiosInstance from '../../api/axiosInstance';
 import { useCookies } from 'react-cookie';
+import axios from 'axios';
 
 const { Title } = Typography;
 
-
+type FieldTypeReg = {
+    username?: string;
+    password?: string;
+    remember?: string;
+    email?: string;
+};
 type FieldType = {
     email?: string;
     password?: string;
@@ -13,6 +19,25 @@ type FieldType = {
 
 const Login: React.FC = () => {
     const [cookies, setCookie] = useCookies(['myCookie']);
+    const [page, setpage] = useState(true)
+    const onFinishReg = async (values: any) => {
+        try {
+
+            const response = await axios.post('https://task.ardapektezol.com/api/register', {
+                username: values.username,
+                email: values.email,
+                password: values.password,
+            });
+
+            console.log('Success:', response.data);
+        } catch (error) {
+            console.error('Failed:', error);
+        }
+    };
+
+    const onFinishFailedReg = (errorInfo: any) => {
+        console.log('Failed:', errorInfo);
+    };
 
     const onFinish = (values: any) => {
         console.log('Success:', values);
@@ -41,42 +66,106 @@ const Login: React.FC = () => {
     };
     return (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <div style={{ marginBottom: '20px' }}>
-                <Title level={2}>Login Form</Title>
-            </div>
-            <Form
-                name="basic"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                style={{ maxWidth: 600 }}
-                initialValues={{ remember: true }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-                autoComplete="on"
-            >
-                <Form.Item<FieldType>
-                    label="Email"
-                    name="email"
-                    rules={[{ required: true, message: 'Please input your username!' }]}
+            {page ? <>
+                <div style={{ marginBottom: '20px' }}>
+                    <Title level={2}>Login Form</Title>
+                </div>
+                <Form
+                    name="basic"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    style={{ maxWidth: 600 }}
+                    initialValues={{ remember: true }}
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
+                    autoComplete="on"
                 >
-                    <Input />
-                </Form.Item>
+                    <Form.Item<FieldType>
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Please input your username!' }]}
+                    >
+                        <Input />
+                    </Form.Item>
 
-                <Form.Item<FieldType>
-                    label="Password"
-                    name="password"
-                    rules={[{ required: true, message: 'Please input your password!' }]}
+                    <Form.Item<FieldType>
+                        label="Password"
+                        name="password"
+                        rules={[{ required: true, message: 'Please input your password!' }]}
+                    >
+                        <Input.Password />
+                    </Form.Item>
+
+
+                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                        <Button type="primary" htmlType="submit">
+                            Submit
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </> : <>
+                <div style={{ marginBottom: '20px' }}>
+                    <Title level={2}>Register Form</Title>
+                </div>
+                <Form
+                    name="basic"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    style={{ maxWidth: 600 }}
+                    initialValues={{ remember: true }}
+                    onFinish={onFinishReg}
+                    onFinishFailed={onFinishFailedReg}
+                    autoComplete="off"
                 >
-                    <Input.Password />
-                </Form.Item>
+
+                    <Form.Item<FieldTypeReg>
+                        label="Username"
+                        name="username"
+                        rules={[{ required: true, message: 'Please input your username!' }]}
+                    >
+                        <Input />
+                    </Form.Item>
 
 
-                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                    <Button type="primary" htmlType="submit">
-                        Submit
-                    </Button>
-                </Form.Item>
-            </Form>
+                    <Form.Item<FieldType>
+                        label="Email"
+                        name="email"
+                        rules={[
+                            { required: true, message: 'Please input your email!' },
+                            { type: 'email', message: 'Please enter a valid email address!' },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+
+                    <Form.Item<FieldType>
+                        label="Password"
+                        name="password"
+                        rules={[{ required: true, message: 'Please input your password!' }]}
+                    >
+                        <Input.Password />
+                    </Form.Item>
+
+                    <Form.Item<FieldTypeReg>
+                        name="remember"
+                        valuePropName="checked"
+                        wrapperCol={{ offset: 8, span: 16 }}
+                    >
+                        <Checkbox>Remember me</Checkbox>
+                    </Form.Item>
+
+                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                        <Button type="primary" htmlType="submit">
+                            Submit
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </>}
+
+
+
+            {page ? <Button type="text" block onClick={() => setpage(false)}>Register</Button> : <Button type="text" block onClick={() => setpage(true)}>Login</Button>}
+
         </div>
     );
 }

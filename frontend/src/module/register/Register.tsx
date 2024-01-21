@@ -6,7 +6,7 @@ const { Title } = Typography;
 
 const onFinish = async (values: any) => {
     try {
-    
+
         const response = await axios.post('https://task.ardapektezol.com/api/register', {
             username: values.username,
             email: values.email,
@@ -45,7 +45,7 @@ const Register: React.FC = () => (
             onFinishFailed={onFinishFailed}
             autoComplete="off"
         >
-           
+
             <Form.Item<FieldType>
                 label="Username"
                 name="username"
@@ -54,7 +54,7 @@ const Register: React.FC = () => (
                 <Input />
             </Form.Item>
 
-            
+
             <Form.Item<FieldType>
                 label="Email"
                 name="email"

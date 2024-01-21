@@ -35,16 +35,7 @@ const App: React.FC = () => {
       key: 'project',
       icon: <MailOutlined />,
     },
-    {
-      label: 'Login',
-      key: 'login',
-      icon: <AppstoreOutlined />,
-    },
-    {
-      label: 'Register',
-      key: 'register',
-      icon: <AppstoreOutlined />,
-    },
+
     {
       label: `Log Out (${usermail})`,
       key: 'logout',
