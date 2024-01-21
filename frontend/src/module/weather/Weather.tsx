@@ -17,7 +17,7 @@ const Weather = () => {
                 const lat = e.latlng.lat.toFixed(6);
                 const lng = e.latlng.lng.toFixed(6);
 
-                fetch(`httpss://api.weatherapi.com/v1/current.json?key=5c028746d8b14fb8925103513242001&q=${lat},${lng}&aqi=no`)
+                fetch(`https://api.weatherapi.com/v1/current.json?key=5c028746d8b14fb8925103513242001&q=${lat},${lng}&aqi=no`)
                     .then(response => response.json())
                     .then(data => {
                         alert(`Weather in ${data.location.name}, ${data.location.region}: ${data.current.condition.text} with a temperature of ${data.current.temp_c}°C`);
