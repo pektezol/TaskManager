@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Button, Card, Cascader, Col, DatePicker, DatePickerProps, Divider, Flex, Form, Input, List, Modal, Radio, Row, Skeleton, Tag, Tooltip } from 'antd';
+import { Avatar, Button, Card, Cascader, Col, DatePicker, DatePickerProps, Divider, Flex, Form, Input, List, Modal, Radio, Row, Skeleton, Tag, Tooltip, notification } from 'antd';
 import { RootState } from '../../state/store';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../api/axiosInstance';
@@ -133,9 +133,17 @@ const Backlog: React.FC = () => {
             .then(() => {
                 getTasksDetail(id)
                 showCollaboratorsModal(id)
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully assigned.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.info({
+                    message: 'Notification',
+                    description: 'You have not successfully assigned.',
+                });
             });
         setSelectedCollaborator("")
         setSelectedCollaboratorProject(0)
@@ -161,10 +169,17 @@ const Backlog: React.FC = () => {
                 console.log(response.data);
                 getTasks()
                 handleCancelC()
-
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully created a task.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.info({
+                    message: 'Notification',
+                    description: 'You have not successfully created a task.',
+                });
             });
     };
     const onFinishUpdateTask = (values: any) => {
@@ -192,9 +207,17 @@ const Backlog: React.FC = () => {
                     console.error("Task ID is undefined");
                 }
                 getTasks()
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully updated a task.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.info({
+                    message: 'Notification',
+                    description: 'You have not successfully updated a task.',
+                });
             });
     };
 
@@ -350,9 +373,17 @@ const Backlog: React.FC = () => {
                 console.log(response.data);
                 setOpenTaskModal(false)
                 getTasks()
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully deleted a task.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.info({
+                    message: 'Notification',
+                    description: 'You have not successfully deleted a task.',
+                });
             });
     };
     const commentTask = (id: number, value: string) => {
@@ -372,9 +403,17 @@ const Backlog: React.FC = () => {
             .delete(`/projects/${count}/tasks/${task_id}/assignee/${user_id}`,)
             .then(() => {
                 getTasksDetail(task_id)
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully removed a assignee.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have not successfully removed a assignee.',
+                });
             });
     };
 

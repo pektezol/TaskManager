@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Cascader, Col, Form, Input, Modal, Row, Tag, Tooltip } from 'antd';
+import { Button, Card, Cascader, Col, Form, Input, Modal, Row, Tag, Tooltip, notification } from 'antd';
 import axiosInstance from '../../api/axiosInstance';
 
 import { useCookies } from 'react-cookie';
@@ -78,9 +78,17 @@ const Projects: React.FC = () => {
             .then(() => {
                 setProjects([]);
                 setReload(true);
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully removed a collaborator.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.info({
+                    message: 'Notification',
+                    description: 'You have not successfully removed a collaborator.',
+                });
             });
     };
 
@@ -99,9 +107,17 @@ const Projects: React.FC = () => {
             .then(() => {
                 setProjects([]);
                 setReload(true);
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully added a collaborator.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have not successfully added a collaborator.',
+                });
             });
         setSelectedCollaborator("")
         setSelectedCollaboratorProject(0)
@@ -128,9 +144,17 @@ const Projects: React.FC = () => {
             .then(response => {
                 setProjects([]);
                 setReload(true)
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully created a project.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.info({
+                    message: 'Notification',
+                    description: 'You have not successfully created a project.',
+                });
             });
     }
     const deleteProject = (value: number) => {
@@ -139,9 +163,17 @@ const Projects: React.FC = () => {
             .then(() => {
                 setProjects([]);
                 setReload(true)
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully deleted a project.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.info({
+                    message: 'Notification',
+                    description: 'You have not successfully deleted a project.',
+                });
             });
     }
     const parseJwtToken = (token: string): DecodedToken | null => {

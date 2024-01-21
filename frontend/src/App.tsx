@@ -62,9 +62,17 @@ const App: React.FC = () => {
       .delete(`/notifications/${id}`, {})
       .then(() => {
         getNotifications()
+        notification.success({
+          message: 'Notification',
+          description: 'You have successfully deleted.',
+        });
       })
       .catch(error => {
         console.error('Error:', error);
+        notification.info({
+          message: 'Notification',
+          description: "You have not been able to delete it successfully.",
+        });
       });
   };
 
@@ -104,10 +112,7 @@ const App: React.FC = () => {
     axiosInstance
       .get('/notifications', {})
       .then(response => {
-
-        console.log(response);
         setNotification(response.data.data.notifications)
-        console.log(notificationData);
       })
       .catch(error => {
         console.error('Error:', error);

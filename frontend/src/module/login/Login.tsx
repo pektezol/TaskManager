@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Checkbox, Form, Input, Typography } from 'antd';
+import { Button, Checkbox, Form, Input, Typography, notification } from 'antd';
 import axiosInstance from '../../api/axiosInstance';
 import { useCookies } from 'react-cookie';
 import axios from 'axios';
@@ -28,10 +28,18 @@ const Login: React.FC = () => {
                 email: values.email,
                 password: values.password,
             });
-
+            notification.success({
+                message: 'Notification',
+                description: 'You have registered successfully.',
+            });
+            setpage(true)
             console.log('Success:', response.data);
         } catch (error) {
             console.error('Failed:', error);
+            notification.success({
+                message: 'Notification',
+                description: 'You have not registered successfully.',
+            });
         }
     };
 
@@ -50,10 +58,17 @@ const Login: React.FC = () => {
             .then(response => {
                 console.log(response.data.data);
                 handleSetCookie(response.data.data)
-
+                notification.success({
+                    message: 'Notification',
+                    description: 'You have successfully logged in.',
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                notification.info({
+                    message: 'Notification',
+                    description: 'You have not successfully logged in.',
+                });
             });
     };
 
