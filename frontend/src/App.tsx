@@ -138,9 +138,6 @@ const App: React.FC = () => {
           <Row>
             <Col span={20}>
               {current === "project" && <Projects />}
-              {current === "task" && <Task />}
-              {current === "login" && <Login />}
-              {current === "register" && <Register />}
             </Col>
             <Col span={4}>
               <div>

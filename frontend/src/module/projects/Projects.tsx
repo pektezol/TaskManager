@@ -235,6 +235,8 @@ const Projects: React.FC = () => {
 
     return (
         <>
+            {count !== 0 ? <Backlog /> : ""}
+
             <Card
                 title="Projects"
                 style={{ marginTop: 10 }}
@@ -327,7 +329,6 @@ const Projects: React.FC = () => {
                 </Modal>
 
             </Card>
-            {count !== 0 ? <Backlog /> : ""}
 
         </>
     );

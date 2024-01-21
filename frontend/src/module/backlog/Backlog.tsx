@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, Button, Card, Cascader, Col, DatePicker, DatePickerProps, Divider, Flex, Form, Input, List, Modal, Radio, Row, Skeleton, Tag, Tooltip, notification } from 'antd';
 import { RootState } from '../../state/store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import axiosInstance from '../../api/axiosInstance';
 import { SingleValueType } from 'rc-cascader/lib/Cascader';
 import { PlusOutlined } from '@ant-design/icons';
+import { incrementByAmount } from '../../state/counterSlice';
 const { Search } = Input;
 interface Owner {
     id: number;
@@ -113,6 +114,7 @@ const Backlog: React.FC = () => {
     const [allUsers, setAllUsers] = useState<UserData[]>([]);
     const [selectedCollaborator, setSelectedCollaborator] = useState("");
     const [updateTaskData, setUpdateTaskData] = useState("2024-02-02");
+    const dispatch = useDispatch()
 
     const showCollaboratorsModal = (project_id: number) => {
         isModalOpenAss === true ? setIsModalOpenAss(false) : setIsModalOpenAss(true)
@@ -434,6 +436,11 @@ const Backlog: React.FC = () => {
                             <Col>
                                 <Button type="text" onClick={() => showTaskModal()}>
                                     Create Task
+                                </Button>
+                            </Col>
+                            <Col>
+                                <Button type="text" danger onClick={() => dispatch(incrementByAmount(0))}>
+                                    Close
                                 </Button>
                             </Col>
                         </Row>
