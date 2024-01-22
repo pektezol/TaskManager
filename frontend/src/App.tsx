@@ -23,12 +23,23 @@ type NotificationType = {
   notification: string;
   read: boolean;
 };
+const containerStyle: React.CSSProperties = {
+  width: '100%',
+  height: 'auto',
+  overflow: 'auto',
+};
 
+const style: React.CSSProperties = {
+  width: '100%',
+  height: 1000,
+};
 const App: React.FC = () => {
   const [current, setCurrent] = useState('project');
   const [cookies, setCookie] = useCookies(['myCookie']);
   const [usermail, setUserMail] = useState("");
+  const [loading, setLoading] = useState(true);
   const [notificationData, setNotification] = useState<NotificationType[]>([]);
+  const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
 
   const items: MenuProps['items'] = [
     {
@@ -123,62 +134,86 @@ const App: React.FC = () => {
       .get('/notifications', {})
       .then(response => {
         setNotification(response.data.data.notifications)
+
+
       })
       .catch(error => {
         console.error('Error:', error);
       });
   }
+  const start = (async () => {
+
+  })
+
   useEffect(() => {
+
     const token = cookies.myCookie;
     const decodedToken = parseJwtToken(token);
-
+    console.log(decodedToken);
     if (decodedToken) {
       setUserMail(decodedToken.sub)
     } else {
       console.log('Invalid or expired token');
     }
     getNotifications()
-  }, [])
+    setLoading(false)
+  }, [cookies])
   return (
-    <>
+    <div >
+
       {(cookies.myCookie === "" || cookies.myCookie === undefined) ? <Login /> :
         <>
-          <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
+          {loading === false ?
+            <>
+              <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
+              <Row>
+                <Col span={20}>
+                  {current === "project" && <Projects />}
+                  {current === "weather" && <Weather />}
+                  {current === "contact" && <Contact />}
+                </Col>
+                <Col span={4} className="notification-col">
+                  <div style={containerStyle} ref={setContainer}>
+                    <div style={style}>
+                      <div>
+                        {notificationData?.map((notification) => (
+                          <div key={notification.id} style={{ marginTop: 10 }}>
 
-          <Row>
-            <Col span={20}>
-              {current === "project" && <Projects />}
-              {current === "weather" && <Weather />}
-              {current === "contact" && <Contact />}
-            </Col>
-            <Col span={4}>
-              <div>
+                            {notification.read ?
+                              <> <Alert
+                                type={notification.read ? 'info' : "warning"}
+                                description={notification.notification}
+                              />
+                                <Button onClick={() => { deleteNotification(notification.id) }} size='small' danger style={{ marginLeft: '10px' }}>
+                                  Delete
+                                </Button> </> : <Popconfirm
+                                  title="Mark as read."
+                                  onConfirm={() => confirm(notification.id)}
+                                  okText="Yes"
+                                  cancelText="No"
+                                >
+                                <Alert
+                                  type={notification.read ? 'info' : "warning"}
+                                  description={notification.notification}
+                                />
+                              </Popconfirm>}
 
-                {notificationData?.map((notification) => (
-                  <div key={notification.id} style={{ marginTop: 10 }}>
-                    <Popconfirm
-                      title="Mark as readed."
-                      onConfirm={() => confirm(notification.id)}
-                      okText="Yes"
-                      cancelText="No"
-                    >
-                      <Alert
-                        type={notification.read ? 'info' : "warning"}
-                        description={notification.notification}
-                      />
-                      <Button onClick={() => { deleteNotification(notification.id) }} size='small' danger style={{ marginLeft: '10px' }}>
-                        Delete
-                      </Button>
-                    </Popconfirm>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </Col>
-          </Row>
 
+                </Col>
+              </Row>
+            </>
+            :
+            <>Loading...</>
+          }
         </>
       }
-    </>
+    </div>
+
   )
 };
 

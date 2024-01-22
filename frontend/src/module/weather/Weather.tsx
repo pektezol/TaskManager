@@ -1,8 +1,21 @@
 import React, { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-
+import { notification } from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
 const Weather = () => {
+    const [api, contextHolder] = notification.useNotification();
+
+
+    const openNotification = (data: any) => {
+        api.open({
+            message: 'Weather',
+            description:
+                `Weather in ${data.location.name}, ${data.location.region}: ${data.current.condition.text} with a temperature of ${data.current.temp_c}°C`,
+            icon: <SmileOutlined style={{ color: '#108ee9' }} />,
+        });
+    };
+
     useEffect(() => {
         let map: L.Map | L.LayerGroup<any>;
 
@@ -20,7 +33,7 @@ const Weather = () => {
                 fetch(`https://api.weatherapi.com/v1/current.json?key=5c028746d8b14fb8925103513242001&q=${lat},${lng}&aqi=no`)
                     .then(response => response.json())
                     .then(data => {
-                        alert(`Weather in ${data.location.name}, ${data.location.region}: ${data.current.condition.text} with a temperature of ${data.current.temp_c}°C`);
+                        { openNotification(data) }
                     })
                     .catch(() => {
                         alert('Error retrieving weather data');
@@ -37,8 +50,11 @@ const Weather = () => {
         };
     }, []);
 
-    return (
-        <div id="map" style={{ height: '500px' }} />
+    return (<>
+        {contextHolder}
+        <div id="map" style={{ height: '100%' }} />
+
+    </>
     );
 };
 

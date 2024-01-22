@@ -47,6 +47,7 @@ interface DecodedToken {
 const Projects: React.FC = () => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [reload, setReload] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalOpenC, setIsModalOpenC] = useState(false);
     const [allUsers, setAllUsers] = useState<UserData[]>([]);
@@ -224,20 +225,22 @@ const Projects: React.FC = () => {
             .get('/projects', {})
             .then(response => {
                 setProjects(response.data.data.projects);
+                setLoading(false)
             })
             .catch(error => {
+                setLoading(false)
                 console.error('Error:', error);
             });
         setReload(false)
-    }, [reload]);
+    }, [reload, cookies]);
 
 
 
     return (
-        <>
+        <div>
             {count !== 0 ? <Backlog /> : ""}
 
-            <Card
+            {loading === true ? <>Loading...</> : <Card
                 title="Projects"
                 style={{ marginTop: 10 }}
                 extra={
@@ -328,9 +331,9 @@ const Projects: React.FC = () => {
                     </Button>
                 </Modal>
 
-            </Card>
+            </Card>}
 
-        </>
+        </div>
     );
 };
 export default Projects;

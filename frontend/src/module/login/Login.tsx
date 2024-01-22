@@ -57,11 +57,20 @@ const Login: React.FC = () => {
             })
             .then(response => {
                 console.log(response.data.data);
-                handleSetCookie(response.data.data)
-                notification.success({
-                    message: 'Notification',
-                    description: 'You have successfully logged in.',
-                });
+
+                if (response.data.success === true) {
+                    handleSetCookie(response.data.data)
+                    notification.success({
+                        message: 'Notification',
+                        description: 'You have successfully logged in.',
+                    });
+                } else {
+                    notification.info({
+                        message: 'Notification',
+                        description: 'You have not successfully logged in.',
+                    });
+                }
+
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -110,7 +119,6 @@ const Login: React.FC = () => {
                     >
                         <Input.Password />
                     </Form.Item>
-
 
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                         <Button type="primary" htmlType="submit">
