@@ -24,7 +24,7 @@ func ListNotifications(c *gin.Context) {
 		Notifications []Notification `json:"notifications"`
 	}
 	notificaitons := []Notification{}
-	sql := `SELECT n.id, n.notification, n.read FROM notifications n WHERE n.user_id = $1`
+	sql := `SELECT n.id, n.notification, n.read FROM notifications n WHERE n.user_id = $1 ORDER BY n.id DESC`
 	rows, err := database.DB.Query(sql, userID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
