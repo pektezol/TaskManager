@@ -263,8 +263,8 @@ func UpdateTask(c *gin.Context) {
 	} else {
 		deadlineTime = nil
 	}
-	sql := `UPDATE tasks SET project_id = $1, owner_id = $2, name = $3, description = $4, status = $5, priority = $6, deadline = $7 WHERE id = $8 AND active = true`
-	_, err = database.DB.Exec(sql, projectID, userID, req.Name, req.Description, req.StatusID, req.PriorityID, deadlineTime, taskID)
+	sql := `UPDATE tasks SET project_id = $1, name = $2, description = $3, status = $4, priority = $5, deadline = $6 WHERE id = $7 AND active = true`
+	_, err = database.DB.Exec(sql, projectID, req.Name, req.Description, req.StatusID, req.PriorityID, deadlineTime, taskID)
 	if err != nil {
 		c.JSON(http.StatusOK, utils.ErrorResponse(err.Error()))
 		return
