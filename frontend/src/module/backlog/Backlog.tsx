@@ -422,12 +422,25 @@ const Backlog: React.FC = () => {
     function moment(deadline: string): import("dayjs").Dayjs | undefined {
         throw new Error('Function not implemented.');
     }
+    const getStatusColor = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'in progress':
+                return '#f6843d';
+            case 'done':
+                return '#0366d6';
+            case 'pending':
+                return '#f39c12';
+
+            default:
+                return '#28a745';
+        }
+    };
 
     return (
         <>
             <br />
             <Card
-                style={{ width: '100%' }}
+                style={{ width: '100%', backgroundColor: '#f0f5ff', border: '1px solid #d1d5da' }}
                 tabList={tabListNoTitle}
                 activeTabKey={activeTabKey2}
                 tabBarExtraContent={
@@ -457,17 +470,19 @@ const Backlog: React.FC = () => {
                         <Col span={6}>
                             <Flex gap="middle" vertical style={{ margin: 10 }}>
                                 <Flex vertical>
-                                    <h2 style={{ marginLeft: 30 }}>Backlog</h2>
+                                    <h2 style={{ marginLeft: 30, }}>Backlog</h2>
                                     {taskData.map((item, i) => (
                                         <>
                                             {item.status === "Backlog" &&
-                                                <Card size="small" title={item.name} extra={<Button type="link" onClick={() => getTasksDetail(item.id)}> Details </Button>} style={{ width: 300, margin: 15 }}>
+                                                <Card size="small" title={item.name} extra={<Button type="link" onClick={() => getTasksDetail(item.id)}> Details </Button>} style={{ width: 300, margin: 15, backgroundColor: '#f6f8fa', border: '1px solid #d1d5da' }}>
                                                     <Row>
                                                         <Col>
-                                                            Owner: <Tag>{item.owner.username}</Tag>
+                                                            Owner: <Tag color="#0366d6">{item.owner.username}</Tag>
                                                         </Col>
                                                         <Col>
-                                                            Priority: <Tag>{item.priority}</Tag>
+                                                            Priority: <Tag color={item.priority === 'Low' ? '#7cb305' : item.priority === 'Normal' ? '#faad14' : item.priority === 'High' ? '#ff4d4f' : ''}>
+                                                                {item.priority}
+                                                            </Tag>
                                                         </Col>
                                                     </Row>
                                                     <Row>
@@ -477,12 +492,12 @@ const Backlog: React.FC = () => {
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            Created Date: <Tag> {item.created_at.split("T")[0]}</Tag>
+                                                            Created Date: <Tag color="#001d66"> {item.created_at.split("T")[0]}</Tag>
                                                         </Col>
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            Deadline: <Tag>{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
+                                                            Deadline: <Tag color="#ff4d4f">{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
                                                         </Col>
                                                     </Row>
                                                     <Cascader
@@ -501,17 +516,19 @@ const Backlog: React.FC = () => {
                         <Col span={6}>
                             <Flex gap="middle" vertical style={{ margin: 10 }}>
                                 <Flex vertical>
-                                    <h2 style={{ marginLeft: 30 }}>In Progress</h2>
+                                    <h2 style={{ marginLeft: 30, }}>In Progress</h2>
                                     {taskData.map((item, i) => (
                                         <>
                                             {item.status === "In Progress" &&
-                                                <Card size="small" title={item.name} extra={<Button type="link" onClick={() => getTasksDetail(item.id)}> Details </Button>} style={{ width: 300, margin: 15 }}>
+                                                <Card size="small" title={item.name} extra={<Button type="link" onClick={() => getTasksDetail(item.id)}> Details </Button>} style={{ width: 300, margin: 15, backgroundColor: '#f6f8fa', border: '1px solid #d1d5da' }}>
                                                     <Row>
                                                         <Col>
-                                                            Owner: <Tag>{item.owner.username}</Tag>
+                                                            Owner: <Tag color="#0366d6">{item.owner.username}</Tag>
                                                         </Col>
                                                         <Col>
-                                                            Priority: <Tag>{item.priority}</Tag>
+                                                            Priority: <Tag color={item.priority === 'Low' ? '#7cb305' : item.priority === 'Normal' ? '#faad14' : item.priority === 'High' ? '#ff4d4f' : ''}>
+                                                                {item.priority}
+                                                            </Tag>
                                                         </Col>
                                                     </Row>
                                                     <Row>
@@ -521,12 +538,12 @@ const Backlog: React.FC = () => {
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            Created Date: <Tag> {item.created_at.split("T")[0]}</Tag>
+                                                            Created Date: <Tag color="#001d66"> {item.created_at.split("T")[0]}</Tag>
                                                         </Col>
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            Deadline: <Tag>{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
+                                                            Deadline: <Tag color="#ff4d4f">{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
                                                         </Col>
                                                     </Row>
                                                     <Cascader
@@ -549,13 +566,15 @@ const Backlog: React.FC = () => {
                                     {taskData.map((item, i) => (
                                         <>
                                             {item.status === "In Review" &&
-                                                <Card size="small" title={item.name} extra={<Button type="link" onClick={() => getTasksDetail(item.id)}> Details </Button>} style={{ width: 300, margin: 15 }}>
+                                                <Card size="small" title={item.name} extra={<Button type="link" onClick={() => getTasksDetail(item.id)}> Details </Button>} style={{ width: 300, margin: 15, backgroundColor: '#f6f8fa', border: '1px solid #d1d5da' }}>
                                                     <Row>
                                                         <Col>
-                                                            Owner: <Tag>{item.owner.username}</Tag>
+                                                            Owner: <Tag color="#0366d6">{item.owner.username}</Tag>
                                                         </Col>
                                                         <Col>
-                                                            Priority: <Tag>{item.priority}</Tag>
+                                                            Priority: <Tag color={item.priority === 'Low' ? '#7cb305' : item.priority === 'Normal' ? '#faad14' : item.priority === 'High' ? '#ff4d4f' : ''}>
+                                                                {item.priority}
+                                                            </Tag>
                                                         </Col>
                                                     </Row>
                                                     <Row>
@@ -565,12 +584,12 @@ const Backlog: React.FC = () => {
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            Created Date: <Tag> {item.created_at.split("T")[0]}</Tag>
+                                                            Created Date: <Tag color="#001d66"> {item.created_at.split("T")[0]}</Tag>
                                                         </Col>
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            Deadline: <Tag>{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
+                                                            Deadline: <Tag color="#ff4d4f">{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
                                                         </Col>
                                                     </Row>
                                                     <Cascader
@@ -593,13 +612,15 @@ const Backlog: React.FC = () => {
                                     {taskData.map((item, i) => (
                                         <>
                                             {item.status === "Done" &&
-                                                <Card size="small" title={item.name} extra={<Button type="link" onClick={() => getTasksDetail(item.id)}> Details </Button>} style={{ width: 300, margin: 15 }}>
+                                                <Card size="small" title={item.name} extra={<Button type="link" onClick={() => getTasksDetail(item.id)}> Details </Button>} style={{ width: 300, margin: 15, backgroundColor: '#f6f8fa', border: '1px solid #d1d5da' }}>
                                                     <Row>
                                                         <Col>
-                                                            Owner: <Tag>{item.owner.username}</Tag>
+                                                            Owner: <Tag color="#0366d6">{item.owner.username}</Tag>
                                                         </Col>
                                                         <Col>
-                                                            Priority: <Tag>{item.priority}</Tag>
+                                                            Priority: <Tag color={item.priority === 'Low' ? '#7cb305' : item.priority === 'Normal' ? '#faad14' : item.priority === 'High' ? '#ff4d4f' : ''}>
+                                                                {item.priority}
+                                                            </Tag>
                                                         </Col>
                                                     </Row>
                                                     <Row>
@@ -609,12 +630,12 @@ const Backlog: React.FC = () => {
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            Created Date: <Tag> {item.created_at.split("T")[0]}</Tag>
+                                                            Created Date: <Tag color="#001d66"> {item.created_at.split("T")[0]}</Tag>
                                                         </Col>
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            Deadline: <Tag>{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
+                                                            Deadline: <Tag color="#ff4d4f">{item.deadline !== null ? item.deadline.split("T")[0] : "-"}</Tag>
                                                         </Col>
                                                     </Row>
                                                     <Cascader
@@ -630,6 +651,7 @@ const Backlog: React.FC = () => {
                                 </Flex>
                             </Flex>
                         </Col>
+
                         <Modal title="Create Task" open={isModalOpenC} onCancel={handleCancelC} footer={null}>
                             <Form
                                 name="basic"
@@ -857,10 +879,10 @@ const Backlog: React.FC = () => {
                     <>
                         <Card
                             size='small'
-                            style={{ marginTop: 16 }}
+                            style={{ marginTop: 16, backgroundColor: '#f6f8fa', border: '1px solid #d1d5da' }}
                             type="inner"
-                            title={priorityData[2].label}
-                            extra={<a href="#">More</a>}
+                            title={<span style={{ color: '#0366d6' }}>{priorityData[2].label}</span>}
+                            extra={<a href="#" style={{ color: '#0366d6' }}>More</a>}
                         >
                             <List
                                 size='small'
@@ -871,14 +893,14 @@ const Backlog: React.FC = () => {
                                         <List.Item.Meta
                                             title={
                                                 <div>
-                                                    <>{item.name}</> - <>Deadline: {item.deadline.split("T")[0]}</>
+                                                    <span style={{ color: '#24292e' }}>{item.name}</span> - <span style={{ color: '#6a737d' }}>Deadline: {item.deadline.split("T")[0]}</span>
                                                 </div>
                                             }
                                             description={
                                                 <>
-                                                    <div>{item.description}</div>
+                                                    <div style={{ color: '#586069' }}>{item.description}</div>
                                                     <div>
-                                                        <Tag style={{ marginRight: 8 }}>{item.status}</Tag>
+                                                        <Tag style={{ marginRight: 8, backgroundColor: getStatusColor(item.status), color: '#ffffff' }}>{item.status}</Tag>
                                                         {item.assignees?.map((assignee) => (
                                                             <Tag key={assignee.id} style={{ marginLeft: 8 }}>
                                                                 {assignee.username}
@@ -892,12 +914,13 @@ const Backlog: React.FC = () => {
                                 )}
                             />
                         </Card>
+
                         <Card
                             size='small'
-                            style={{ marginTop: 16 }}
+                            style={{ marginTop: 16, backgroundColor: '#f6f8fa', border: '1px solid #d1d5da' }}
                             type="inner"
-                            title={priorityData[1].label}
-                            extra={<a href="#">More</a>}
+                            title={<span style={{ color: '#0366d6' }}>{priorityData[1].label}</span>}
+                            extra={<a href="#" style={{ color: '#0366d6' }}>More</a>}
                         >
                             <List
                                 size='small'
@@ -908,14 +931,14 @@ const Backlog: React.FC = () => {
                                         <List.Item.Meta
                                             title={
                                                 <div>
-                                                    <>{item.name}</> - <>Deadline: {item.deadline.split("T")[0]}</>
+                                                    <span style={{ color: '#24292e' }}>{item.name}</span> - <span style={{ color: '#6a737d' }}>Deadline: {item.deadline.split("T")[0]}</span>
                                                 </div>
                                             }
                                             description={
                                                 <>
-                                                    <div>{item.description}</div>
+                                                    <div style={{ color: '#586069' }}>{item.description}</div>
                                                     <div>
-                                                        <Tag style={{ marginRight: 8 }}>{item.status}</Tag>
+                                                        <Tag style={{ marginRight: 8, backgroundColor: getStatusColor(item.status), color: '#ffffff' }}>{item.status}</Tag>
                                                         {item.assignees?.map((assignee) => (
                                                             <Tag key={assignee.id} style={{ marginLeft: 8 }}>
                                                                 {assignee.username}
@@ -929,12 +952,13 @@ const Backlog: React.FC = () => {
                                 )}
                             />
                         </Card>
+
                         <Card
-                            style={{ marginTop: 16 }}
-                            type="inner"
-                            title={priorityData[0].label}
-                            extra={<a href="#">More</a>}
                             size='small'
+                            style={{ marginTop: 16, backgroundColor: '#f6f8fa', border: '1px solid #d1d5da' }}
+                            type="inner"
+                            title={<span style={{ color: '#0366d6' }}>{priorityData[0].label}</span>}
+                            extra={<a href="#" style={{ color: '#0366d6' }}>More</a>}
                         >
                             <List
                                 size='small'
@@ -945,14 +969,14 @@ const Backlog: React.FC = () => {
                                         <List.Item.Meta
                                             title={
                                                 <div>
-                                                    <>{item.name}</> - <>Deadline: {item.deadline.split("T")[0]}</>
+                                                    <span style={{ color: '#24292e' }}>{item.name}</span> - <span style={{ color: '#6a737d' }}>Deadline: {item.deadline.split("T")[0]}</span>
                                                 </div>
                                             }
                                             description={
                                                 <>
-                                                    <div>{item.description}</div>
+                                                    <div style={{ color: '#586069' }}>{item.description}</div>
                                                     <div>
-                                                        <Tag style={{ marginRight: 8 }}>{item.status}</Tag>
+                                                        <Tag style={{ marginRight: 8, backgroundColor: getStatusColor(item.status), color: '#ffffff' }}>{item.status}</Tag>
                                                         {item.assignees?.map((assignee) => (
                                                             <Tag key={assignee.id} style={{ marginLeft: 8 }}>
                                                                 {assignee.username}

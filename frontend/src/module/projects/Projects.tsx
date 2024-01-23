@@ -237,103 +237,104 @@ const Projects: React.FC = () => {
 
 
     return (
-        <div>
+        <div >
             {count !== 0 ? <Backlog /> : ""}
 
-            {loading === true ? <>Loading...</> : <Card
-                title="Projects"
-                style={{ marginTop: 10 }}
-                extra={
-                    <Button type="primary" onClick={showModal}>
-                        Create Project
-                    </Button>}
-            >
-                {projects ? (
-                    projects.map((item, index) => (
-                        <Card
-                            key={index}
-                            style={{ marginTop: 16 }}
-                            type="inner"
-                            title={<Button type="text" onClick={() => { openTasks(item.id) }}>{item.username} - Created at: {item.created_at.split("T")[0]} {item.created_at.split("T")[1].split(".")[0]}</Button>}
-                            extra={item.owner.email === usermail ?
-                                <>
-                                    <Button type="text" danger onClick={() => deleteProject(item.id)}>
-                                        Delete This Project
-                                    </Button>
-                                    <Button type="text" onClick={() => showCollaboratorsModal(item.id)}>
-                                        Add Collaborators
-                                    </Button>
-                                </>
-                                : ""}
-                        >
-                            <Row>
-                                <Col span={4}>
-                                    Owner :
-                                    <Tag> {` ${item.owner.username}  `} </Tag>
-                                </Col>
-                                <Col>
-                                    Collaborators :
-                                    {item.collaborators.map((val, i) => (
-                                        <>
-                                            {item.owner.email === usermail ?
-                                                <>
+            {loading === true ? <>Loading...</> : (
+                <Card
+                    title={'Projects'}
+                    style={{ marginTop: 10, backgroundColor: '#f0f5ff', border: '1px solid #d1d5da' }}
+                    extra={
+                        <Button type="primary" onClick={showModal} style={{ backgroundColor: '#001d66' }}>
+                            Create Project
+                        </Button>}
+                >
+                    {projects ? (
+                        projects.map((item, index) => (
+                            <Card
+                                key={index}
+                                style={{ marginTop: 16, backgroundColor: '#f6f8fa', border: '1px solid #d1d5da' }}
+                                type="inner"
+                                title={<Button type="text" onClick={() => { openTasks(item.id) }}>{item.username} - Created at: {item.created_at.split("T")[0]} {item.created_at.split("T")[1].split(".")[0]}</Button>}
+                                extra={item.owner.email === usermail ?
+                                    <>
+                                        <Button type="primary" danger onClick={() => deleteProject(item.id)} style={{ backgroundColor: '#fa8c16' }}>
+                                            Delete This Project
+                                        </Button>
+
+
+                                        <Button type="primary" onClick={() => showCollaboratorsModal(item.id)} style={{ backgroundColor: '#0958d9' }}>
+                                            Add Collaborators
+                                        </Button>
+                                    </>
+                                    : ""}
+                            >
+                                <Row>
+                                    <Col span={4}>
+                                        Owner:
+                                        <Tag color="blue">{` ${item.owner.username} `}</Tag>
+                                    </Col>
+                                    <Col>
+                                        Collaborators:
+                                        {item.collaborators.map((val, i) => (
+                                            <React.Fragment key={i}>
+                                                {item.owner.email === usermail ? (
                                                     <Tooltip title={<Button size='small' type="link" danger onClick={() => removeCollaborators(item.id, val.id)}>
                                                         Remove Collaborator
                                                     </Button>} key={"red"}>
-                                                        <Tag>  {val.username}   </Tag>
+                                                        <Tag color="red"> {val.username} </Tag>
                                                     </Tooltip>
-                                                </>
-                                                :
-                                                <>
-                                                    <Tag>  {val.username}   </Tag>
-                                                </>}
-                                        </>
-                                    ))}
-                                </Col>
-                            </Row>
-                        </Card>
-                    ))
-                ) : (
-                    <p>Loading...</p>
-                )}
-                <Modal title="Create Project" open={isModalOpen} onCancel={handleCancel} footer={null}>
-                    <Form
-                        name="basic"
-                        labelCol={{ span: 8 }}
-                        wrapperCol={{ span: 16 }}
-                        style={{ maxWidth: 600 }}
-                        initialValues={{ remember: true }}
-                        onFinish={onFinish}
-                        onFinishFailed={onFinishFailed}
-                        autoComplete="off"
-                    >
-                        <Form.Item<FieldType>
-                            label="Project Name"
-                            name="name"
-                            rules={[{ required: true, message: 'Please input your username!' }]}
+                                                ) : (
+                                                    <Tag color="green"> {val.username} </Tag>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </Col>
+                                </Row>
+                            </Card>
+                        ))
+                    ) : (
+                        <p>Loading...</p>
+                    )}
+                    <Modal title="Create Project" open={isModalOpen} onCancel={handleCancel} footer={null}>
+                        <Form
+                            name="basic"
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 16 }}
+                            style={{ maxWidth: 600 }}
+                            initialValues={{ remember: true }}
+                            onFinish={onFinish}
+                            onFinishFailed={onFinishFailed}
+                            autoComplete="off"
                         >
-                            <Input />
-                        </Form.Item>
+                            <Form.Item
+                                label="Project Name"
+                                name="name"
+                                rules={[{ required: true, message: 'Please input your username!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
 
-                        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                            <Button type="primary" htmlType="submit">
-                                Submit
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </Modal>
-                <Modal title="Add Collaborators" open={isModalOpenC} onCancel={handleCancelC} footer={null}>
-                    <Cascader options={allUsers} onChange={(e) => onChangeCollaborator(e)} placeholder="Please select" style={{ marginLeft: 85 }} />
-                    <Button type="primary" style={{ marginLeft: 25 }}
-                        onClick={() => collaboratorSubmit()}
-                    >
-                        Submit
-                    </Button>
-                </Modal>
-
-            </Card>}
-
+                            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                                <Button type="primary" htmlType="submit">
+                                    Submit
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+                    <Modal title="Add Collaborators" open={isModalOpenC} onCancel={handleCancelC} footer={null}>
+                        <Cascader options={allUsers} onChange={(e) => onChangeCollaborator(e)} placeholder="Please select" style={{ marginLeft: 85 }} />
+                        <Button type="primary" style={{ marginLeft: 25 }}
+                            onClick={() => collaboratorSubmit()}
+                        >
+                            Submit
+                        </Button>
+                    </Modal>
+                </Card>
+            )}
         </div>
+
+
     );
 };
 export default Projects;
